@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "82357836664",
+    "project_id": "aulainventario",
+    "storage_bucket": "aulainventario.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:82357836664:android:349e6ee78e6d460bfdc68d",
+        "android_client_info": {
+          "package_name": "com.manuel.aulainventario"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "82357836664-4kqid7p5s5t5rq4o0vgiat3hs9j58o45.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.manuel.aulainventario",
+            "certificate_hash": "112f8b3ca6da778bf4bfd7529a3ef4cce271af20"
+          }
+        },
+        {
+          "client_id": "82357836664-ah6h5pmoe4ca8pju1l6uu2khskunf7l6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNykHtH_hWTFQZJlEOige_EI6qY6rGhZ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "82357836664-ah6h5pmoe4ca8pju1l6uu2khskunf7l6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
