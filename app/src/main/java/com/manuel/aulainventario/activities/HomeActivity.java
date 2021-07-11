@@ -1,10 +1,16 @@
 package com.manuel.aulainventario.activities;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,12 +21,14 @@ import com.google.android.material.tabs.TabLayout;
 import com.manuel.aulainventario.R;
 import com.manuel.aulainventario.adapters.FragmentAdapter;
 import com.manuel.aulainventario.providers.AuthProvider;
+import com.manuel.aulainventario.utils.ConnectionReceiver;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements ConnectionReceiver.ReceiverListener {
     TabLayout tabLayout;
     ViewPager2 viewPager2;
     FragmentAdapter fragmentAdapter;
     AuthProvider authProvider;
+    boolean isPressed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +64,25 @@ public class HomeActivity extends AppCompatActivity {
                 tabLayout.selectTab(tabLayout.getTabAt(position));
             }
         });
+        checkConnection();
+    }
+
+    private void checkConnection() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(new ConnectionReceiver(), intentFilter);
+        ConnectionReceiver.listener = this;
+        ConnectivityManager manager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        boolean isConnected = networkInfo != null && networkInfo.isConnectedOrConnecting();
+        showSnackBar(isConnected);
+    }
+
+    private void showSnackBar(boolean isConnected) {
+        if (!isConnected) {
+            Toast.makeText(getApplicationContext(), "Error de red, verifique su conexión", Toast.LENGTH_LONG).show();
+            finishAffinity();
+        }
     }
 
     @Override
@@ -88,5 +115,35 @@ public class HomeActivity extends AppCompatActivity {
         Intent intent = new Intent(HomeActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    @Override
+    public void onNetworkChange(boolean isConnected) {
+        showSnackBar(isConnected);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkConnection();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        checkConnection();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isPressed) {
+            finishAffinity();
+            System.exit(0);
+        } else {
+            Toast.makeText(getApplicationContext(), "Presione de nuevo para salir", Toast.LENGTH_SHORT).show();
+            isPressed = true;
+        }
+        Runnable runnable = () -> isPressed = false;
+        new Handler().postDelayed(runnable, 2500);
     }
 }

@@ -6,9 +6,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.manuel.aulainventario.fragments.ActivoFragment;
-import com.manuel.aulainventario.fragments.ConsumoFragment;
-import com.manuel.aulainventario.fragments.DidacticoFragment;
+import com.manuel.aulainventario.fragments.ActiveFragment;
+import com.manuel.aulainventario.fragments.ConsumptionFragment;
+import com.manuel.aulainventario.fragments.DidacticFragment;
 import com.manuel.aulainventario.fragments.PedagogicalFragment;
 
 public class FragmentAdapter extends FragmentStateAdapter {
@@ -21,11 +21,11 @@ public class FragmentAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position) {
             case 1:
-                return new DidacticoFragment();
+                return new DidacticFragment();
             case 2:
-                return new ConsumoFragment();
+                return new ConsumptionFragment();
             case 3:
-                return new ActivoFragment();
+                return new ActiveFragment();
         }
         return new PedagogicalFragment();
     }

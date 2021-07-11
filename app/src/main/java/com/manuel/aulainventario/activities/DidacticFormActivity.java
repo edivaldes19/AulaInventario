@@ -19,10 +19,10 @@ import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.manuel.aulainventario.R;
 import com.manuel.aulainventario.models.Condition;
-import com.manuel.aulainventario.models.Pedagogical;
+import com.manuel.aulainventario.models.Didactic;
 import com.manuel.aulainventario.providers.AuthProvider;
 import com.manuel.aulainventario.providers.ConditionsProvider;
-import com.manuel.aulainventario.providers.PedagogicalProvider;
+import com.manuel.aulainventario.providers.DidacticProvider;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,37 +31,37 @@ import java.util.Objects;
 
 import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
 
-public class PedagogicalFormActivity extends AppCompatActivity {
+public class DidacticFormActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
-    TextInputEditText mEditTextNumberP, mEditTextDescriptionP, mEditTextAmountP;
-    MaterialTextView mTextViewConditionSelectedP;
-    Spinner mSpinnerP;
-    MaterialButton mButtonClearP, mButtonAddP;
+    TextInputEditText mEditTextNumberD, mEditTextDescriptionD, mEditTextAmountD;
+    MaterialTextView mTextViewConditionSelectedD;
+    Spinner mSpinnerD;
+    MaterialButton mButtonClearD, mButtonAddD;
     AuthProvider mAuthProvider;
     ConditionsProvider mConditionsProvider;
-    PedagogicalProvider mPedagogicalProvider;
+    DidacticProvider mDidacticProvider;
     ProgressDialog mProgressDialog;
-    String mExtraIdPedagogicalUpdate, mExtraPedagogicalTitle;
+    String mExtraIdDidacticUpdate, mExtraDidacticTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pedagogical_form);
-        coordinatorLayout = findViewById(R.id.coordinatorPedagogical);
-        mEditTextNumberP = findViewById(R.id.textInputNumberP);
-        mEditTextDescriptionP = findViewById(R.id.textInputDescriptionP);
-        mEditTextAmountP = findViewById(R.id.textInputAmountP);
-        mTextViewConditionSelectedP = findViewById(R.id.textViewConditionSelectedP);
-        mSpinnerP = findViewById(R.id.spinnerConditionP);
-        mButtonClearP = findViewById(R.id.btnClearP);
-        mButtonAddP = findViewById(R.id.btnAddP);
+        setContentView(R.layout.activity_didactic_form);
+        coordinatorLayout = findViewById(R.id.coordinatorDidactic);
+        mEditTextNumberD = findViewById(R.id.textInputNumberD);
+        mEditTextDescriptionD = findViewById(R.id.textInputDescriptionD);
+        mEditTextAmountD = findViewById(R.id.textInputAmountD);
+        mTextViewConditionSelectedD = findViewById(R.id.textViewConditionSelectedD);
+        mSpinnerD = findViewById(R.id.spinnerConditionD);
+        mButtonClearD = findViewById(R.id.btnClearD);
+        mButtonAddD = findViewById(R.id.btnAddD);
         mAuthProvider = new AuthProvider();
         mConditionsProvider = new ConditionsProvider();
-        mPedagogicalProvider = new PedagogicalProvider();
-        mExtraIdPedagogicalUpdate = getIntent().getStringExtra("idPedagogicalUpdate");
-        mExtraPedagogicalTitle = getIntent().getStringExtra("pedagogicalTitle");
-        if (mExtraPedagogicalTitle != null && !mExtraPedagogicalTitle.isEmpty()) {
-            setTitle("Editar registro " + mExtraPedagogicalTitle);
+        mDidacticProvider = new DidacticProvider();
+        mExtraIdDidacticUpdate = getIntent().getStringExtra("idDidacticUpdate");
+        mExtraDidacticTitle = getIntent().getStringExtra("didacticTitle");
+        if (mExtraDidacticTitle != null && !mExtraDidacticTitle.isEmpty()) {
+            setTitle("Editar registro " + mExtraDidacticTitle);
         } else {
             setTitle("Nuevo registro");
         }
@@ -70,31 +70,31 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Por favor, espere un momento");
         mProgressDialog.setCancelable(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        validateFieldsAsYouType(mEditTextNumberP, "El número es obligatorio");
-        validateFieldsAsYouType(mEditTextDescriptionP, "La descripción es obligatoria");
-        validateFieldsAsYouType(mEditTextAmountP, "La cantidad es obligatoria");
+        validateFieldsAsYouType(mEditTextNumberD, "El número es obligatorio");
+        validateFieldsAsYouType(mEditTextDescriptionD, "La descripción es obligatoria");
+        validateFieldsAsYouType(mEditTextAmountD, "La cantidad es obligatoria");
         getAllConditions();
         getDataFromAdapter();
-        mButtonClearP.setOnClickListener(v -> cleanForm());
-        mButtonAddP.setOnClickListener(v -> {
-            if (getIntent().getBooleanExtra("pedagogicalSelect", false)) {
+        mButtonClearD.setOnClickListener(v -> cleanForm());
+        mButtonAddD.setOnClickListener(v -> {
+            if (getIntent().getBooleanExtra("didacticSelect", false)) {
                 //EDITAR REGISTRO
-                String number = Objects.requireNonNull(mEditTextNumberP.getText()).toString().trim();
-                String description = Objects.requireNonNull(mEditTextDescriptionP.getText()).toString().trim();
-                String amount = Objects.requireNonNull(mEditTextAmountP.getText()).toString().trim();
-                String condition = mSpinnerP.getSelectedItem().toString().trim();
+                String number = Objects.requireNonNull(mEditTextNumberD.getText()).toString().trim();
+                String description = Objects.requireNonNull(mEditTextDescriptionD.getText()).toString().trim();
+                String amount = Objects.requireNonNull(mEditTextAmountD.getText()).toString().trim();
+                String condition = mSpinnerD.getSelectedItem().toString().trim();
                 if (!number.isEmpty()) {
                     if (!description.isEmpty()) {
                         if (!amount.isEmpty()) {
                             if (!condition.isEmpty()) {
-                                Pedagogical pedagogical = new Pedagogical();
-                                pedagogical.setId(mExtraIdPedagogicalUpdate);
-                                pedagogical.setNumber(Long.parseLong(number));
-                                pedagogical.setDescription(description);
-                                pedagogical.setAmount(Long.parseLong(amount));
-                                pedagogical.setCondition(condition);
-                                pedagogical.setTimestamp(new Date().getTime());
-                                updateInfo(pedagogical);
+                                Didactic didactic = new Didactic();
+                                didactic.setId(mExtraIdDidacticUpdate);
+                                didactic.setNumber(Long.parseLong(number));
+                                didactic.setDescription(description);
+                                didactic.setAmount(Long.parseLong(amount));
+                                didactic.setCondition(condition);
+                                didactic.setTimestamp(new Date().getTime());
+                                updateInfo(didactic);
                             } else {
                                 Snackbar.make(v, "El estado es obligatorio", Snackbar.LENGTH_SHORT).show();
                             }
@@ -109,22 +109,22 @@ public class PedagogicalFormActivity extends AppCompatActivity {
                 }
             } else {
                 //CREAR REGISTRO
-                String number = Objects.requireNonNull(mEditTextNumberP.getText()).toString().trim();
-                String description = Objects.requireNonNull(mEditTextDescriptionP.getText()).toString().trim();
-                String amount = Objects.requireNonNull(mEditTextAmountP.getText()).toString().trim();
-                String condition = mSpinnerP.getSelectedItem().toString().trim();
+                String number = Objects.requireNonNull(mEditTextNumberD.getText()).toString().trim();
+                String description = Objects.requireNonNull(mEditTextDescriptionD.getText()).toString().trim();
+                String amount = Objects.requireNonNull(mEditTextAmountD.getText()).toString().trim();
+                String condition = mSpinnerD.getSelectedItem().toString().trim();
                 if (!number.isEmpty()) {
                     if (!description.isEmpty()) {
                         if (!amount.isEmpty()) {
                             if (!condition.isEmpty()) {
-                                Pedagogical pedagogical = new Pedagogical();
-                                pedagogical.setNumber(Long.parseLong(number));
-                                pedagogical.setDescription(description);
-                                pedagogical.setAmount(Long.parseLong(amount));
-                                pedagogical.setCondition(condition);
-                                pedagogical.setIdTeacher(mAuthProvider.getUid());
-                                pedagogical.setTimestamp(new Date().getTime());
-                                saveInfo(pedagogical);
+                                Didactic didactic = new Didactic();
+                                didactic.setNumber(Long.parseLong(number));
+                                didactic.setDescription(description);
+                                didactic.setAmount(Long.parseLong(amount));
+                                didactic.setCondition(condition);
+                                didactic.setIdTeacher(mAuthProvider.getUid());
+                                didactic.setTimestamp(new Date().getTime());
+                                saveInfo(didactic);
                             } else {
                                 Snackbar.make(v, "El estado es obligatorio", Snackbar.LENGTH_SHORT).show();
                             }
@@ -143,41 +143,41 @@ public class PedagogicalFormActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void getDataFromAdapter() {
-        if (getIntent().getBooleanExtra("pedagogicalSelect", false)) {
-            getPedagogical();
-            mButtonAddP.setIconResource(R.drawable.ic_edit);
-            mButtonAddP.setText("Editar");
+        if (getIntent().getBooleanExtra("didacticSelect", false)) {
+            getDidactic();
+            mButtonAddD.setIconResource(R.drawable.ic_edit);
+            mButtonAddD.setText("Editar");
         }
     }
 
-    private void getPedagogical() {
-        mPedagogicalProvider.getPedagogicalById(mExtraIdPedagogicalUpdate).addOnSuccessListener(documentSnapshot -> {
+    private void getDidactic() {
+        mDidacticProvider.getDidacticById(mExtraIdDidacticUpdate).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("number")) {
                     long number = documentSnapshot.getLong("number");
-                    mEditTextNumberP.setText(String.valueOf(number));
+                    mEditTextNumberD.setText(String.valueOf(number));
                 }
                 if (documentSnapshot.contains("description")) {
                     String description = documentSnapshot.getString("description");
-                    mEditTextDescriptionP.setText(description);
+                    mEditTextDescriptionD.setText(description);
                 }
                 if (documentSnapshot.contains("amount")) {
                     long amount = documentSnapshot.getLong("amount");
-                    mEditTextAmountP.setText(String.valueOf(amount));
+                    mEditTextAmountD.setText(String.valueOf(amount));
                 }
                 if (documentSnapshot.contains("condition")) {
                     String condition = documentSnapshot.getString("condition");
-                    mTextViewConditionSelectedP.setText(condition);
+                    mTextViewConditionSelectedD.setText(condition);
                     if (condition != null) {
                         switch (condition) {
                             case "Bueno":
-                                mSpinnerP.setSelection(0);
+                                mSpinnerD.setSelection(0);
                                 break;
                             case "Malo":
-                                mSpinnerP.setSelection(1);
+                                mSpinnerD.setSelection(1);
                                 break;
                             case "Regular":
-                                mSpinnerP.setSelection(2);
+                                mSpinnerD.setSelection(2);
                                 break;
                         }
                     }
@@ -186,11 +186,11 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         });
     }
 
-    private void saveInfo(Pedagogical pedagogical) {
+    private void saveInfo(Didactic didactic) {
         if (mProgressDialog.isShowing()) {
             mProgressDialog.show();
         }
-        mPedagogicalProvider.save(pedagogical).addOnCompleteListener(task -> {
+        mDidacticProvider.save(didactic).addOnCompleteListener(task -> {
             mProgressDialog.dismiss();
             if (task.isSuccessful()) {
                 finish();
@@ -201,11 +201,11 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         });
     }
 
-    private void updateInfo(Pedagogical pedagogical) {
+    private void updateInfo(Didactic didactic) {
         if (mProgressDialog.isShowing()) {
             mProgressDialog.show();
         }
-        mPedagogicalProvider.update(pedagogical).addOnCompleteListener(task -> {
+        mDidacticProvider.update(didactic).addOnCompleteListener(task -> {
             mProgressDialog.dismiss();
             if (task.isSuccessful()) {
                 finish();
@@ -228,14 +228,14 @@ public class PedagogicalFormActivity extends AppCompatActivity {
                         }
                     }
                 }
-                ArrayAdapter<Condition> arrayAdapter = new ArrayAdapter<>(PedagogicalFormActivity.this, android.R.layout.simple_dropdown_item_1line, conditionList);
-                mSpinnerP.setAdapter(arrayAdapter);
-                mSpinnerP.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                ArrayAdapter<Condition> arrayAdapter = new ArrayAdapter<>(DidacticFormActivity.this, android.R.layout.simple_dropdown_item_1line, conditionList);
+                mSpinnerD.setAdapter(arrayAdapter);
+                mSpinnerD.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         String condition = parent.getItemAtPosition(position).toString().trim();
-                        mTextViewConditionSelectedP.setText("Estado: " + condition);
+                        mTextViewConditionSelectedD.setText("Estado: " + condition);
                     }
 
                     @Override
@@ -250,11 +250,11 @@ public class PedagogicalFormActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void cleanForm() {
-        mEditTextNumberP.setText(null);
-        mEditTextDescriptionP.setText(null);
-        mEditTextAmountP.setText(null);
-        mTextViewConditionSelectedP.setText("Estado: ");
-        mSpinnerP.setSelection(0);
+        mEditTextNumberD.setText(null);
+        mEditTextDescriptionD.setText(null);
+        mEditTextAmountD.setText(null);
+        mTextViewConditionSelectedD.setText("Estado: ");
+        mSpinnerD.setSelection(0);
     }
 
     @Override

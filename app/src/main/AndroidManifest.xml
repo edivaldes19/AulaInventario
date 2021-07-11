@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
         android:allowBackup="true"
@@ -16,6 +15,21 @@
         android:theme="@style/Theme.AulaInventario">
         <activity
             android:name=".activities.PedagogicalFormActivity"
+            android:parentActivityName=".activities.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AulaInventarioActionBar" />
+        <activity
+            android:name=".activities.DidacticFormActivity"
+            android:parentActivityName=".activities.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AulaInventarioActionBar" />
+        <activity
+            android:name=".activities.ConsumptionFormActivity"
+            android:parentActivityName=".activities.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AulaInventarioActionBar" />
+        <activity
+            android:name=".activities.ActiveFormActivity"
             android:parentActivityName=".activities.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AulaInventarioActionBar" />

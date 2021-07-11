@@ -36,4 +36,7 @@
     <string name="currentVersion">Versión: 1.0.0</string>
     <string name="copyrightAndRelease">© Julio 2021 EdiVal</string>
     <string name="back">VOLVER</string>
+    <string name="key">Clave</string>
+    <string name="price">Precio</string>
+    <string name="total">Total</string>
 </resources>
