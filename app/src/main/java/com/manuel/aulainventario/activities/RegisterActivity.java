@@ -23,6 +23,7 @@ import com.manuel.aulainventario.R;
 import com.manuel.aulainventario.models.Kinder;
 import com.manuel.aulainventario.models.Teacher;
 import com.manuel.aulainventario.providers.AuthProvider;
+import com.manuel.aulainventario.providers.CollectionsProvider;
 import com.manuel.aulainventario.providers.KinderProvider;
 import com.manuel.aulainventario.providers.TeachersProvider;
 
@@ -39,14 +40,16 @@ public class RegisterActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
     ShapeableImageView mImageViewBack;
     TextInputEditText mTextInputUsername, mTextInputEmailR, mTextInputPhone, mTextInputPasswordR, mTextInputConfirmPasswordR;
-    MaterialTextView mTextViewKinderSelected;
-    Spinner mSpinner;
+    MaterialTextView mTextViewKinderSelected, mTextViewTurnSelected, mTextViewGradeSelected, mTextViewGroupSelected;
+    Spinner mSpinnerKinder, mSpinnerTurn, mSpinnerGrade, mSpinnerGroup;
     MaterialButton materialButtonRegister;
     AuthProvider mAuthProvider;
     TeachersProvider mTeachersProvider;
     KinderProvider mKinderProvider;
+    CollectionsProvider mCollectionsProviderShifts, mCollectionsProviderGrades, mCollectionsProviderGroups;
     ProgressDialog mDialog;
-    List<String> mUsernameList, mPhoneList;
+    ArrayList<String> mUsernameList, mPhoneList, mShiftsList, mGradesList, mGroupsList;
+    String mIdKinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,13 +63,25 @@ public class RegisterActivity extends AppCompatActivity {
         mTextInputPasswordR = findViewById(R.id.textInputPasswordR);
         mTextInputConfirmPasswordR = findViewById(R.id.textInputConfirmPasswordR);
         mTextViewKinderSelected = findViewById(R.id.textViewKinderSelectedR);
-        mSpinner = findViewById(R.id.spinnerKinderRegister);
+        mTextViewTurnSelected = findViewById(R.id.textViewTurnSelectedR);
+        mTextViewGradeSelected = findViewById(R.id.textViewGradeSelectedR);
+        mTextViewGroupSelected = findViewById(R.id.textViewGroupSelectedR);
+        mSpinnerKinder = findViewById(R.id.spinnerKinderRegister);
+        mSpinnerTurn = findViewById(R.id.spinnerTurnRegister);
+        mSpinnerGrade = findViewById(R.id.spinnerGradeRegister);
+        mSpinnerGroup = findViewById(R.id.spinnerGroupRegister);
         materialButtonRegister = findViewById(R.id.btnRegister);
         mAuthProvider = new AuthProvider();
         mTeachersProvider = new TeachersProvider();
         mKinderProvider = new KinderProvider();
+        mCollectionsProviderShifts = new CollectionsProvider(this, "Shifts");
+        mCollectionsProviderGrades = new CollectionsProvider(this, "Grades");
+        mCollectionsProviderGroups = new CollectionsProvider(this, "Groups");
         mUsernameList = new ArrayList<>();
         mPhoneList = new ArrayList<>();
+        mShiftsList = new ArrayList<>();
+        mGradesList = new ArrayList<>();
+        mGroupsList = new ArrayList<>();
         mDialog = new ProgressDialog(this);
         mDialog.setTitle("Registrando...");
         mDialog.setMessage("Por favor, espere un momento");
@@ -77,58 +92,74 @@ public class RegisterActivity extends AppCompatActivity {
         validateFieldsAsYouType(mTextInputPhone, "El número de teléfono es obligatorio");
         validatePasswordFieldsAsYouType(mTextInputPasswordR, "La contraseña es obligatoria");
         validatePasswordFieldsAsYouType(mTextInputConfirmPasswordR, "Debe confirmar su contraseña");
-        mUsernameList.clear();
-        isUserInfoExist(mUsernameList, "username");
-        mPhoneList.clear();
+        isUserInfoExist(mUsernameList, "teachername");
         isUserInfoExist(mPhoneList, "phone");
+        mCollectionsProviderShifts.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mShiftsList, "turn", mSpinnerTurn, "Turno: ", mTextViewTurnSelected, "Error al obtener los turnos");
+        mCollectionsProviderGrades.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGradesList, "grade", mSpinnerGrade, "Grado: ", mTextViewGradeSelected, "Error al obtener los grados");
+        mCollectionsProviderGroups.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGroupsList, "group", mSpinnerGroup, "Grupo: ", mTextViewGroupSelected, "Error al obtener los grupos");
         getAllKindergartens();
         materialButtonRegister.setOnClickListener(v -> {
             String username = Objects.requireNonNull(mTextInputUsername.getText()).toString().trim();
             String email = Objects.requireNonNull(mTextInputEmailR.getText()).toString().trim();
             String phone = Objects.requireNonNull(mTextInputPhone.getText()).toString().trim();
-            String kinder = mSpinner.getSelectedItem().toString().trim();
+            String kinder = mSpinnerKinder.getSelectedItem().toString().trim();
+            String turn = mSpinnerTurn.getSelectedItem().toString().trim();
+            String grade = mSpinnerGrade.getSelectedItem().toString().trim();
+            String group = mSpinnerGroup.getSelectedItem().toString().trim();
             String password = Objects.requireNonNull(mTextInputPasswordR.getText()).toString().trim();
             String confirmPassword = Objects.requireNonNull(mTextInputConfirmPasswordR.getText()).toString().trim();
             if (!username.isEmpty()) {
                 if (!email.isEmpty()) {
                     if (!phone.isEmpty()) {
                         if (!kinder.isEmpty()) {
-                            if (!password.isEmpty()) {
-                                if (!confirmPassword.isEmpty()) {
-                                    if (!mUsernameList.isEmpty()) {
-                                        for (String s : mUsernameList) {
-                                            if (s.equals(username)) {
-                                                Snackbar.make(v, "Ya existe un docente con ese nombre", Snackbar.LENGTH_SHORT).show();
-                                                return;
-                                            }
-                                        }
-                                    }
-                                    if (!mPhoneList.isEmpty()) {
-                                        for (String s : mPhoneList) {
-                                            if (s.equals(phone)) {
-                                                Snackbar.make(v, "Ya existe un docente con ese teléfono", Snackbar.LENGTH_SHORT).show();
-                                                return;
-                                            }
-                                        }
-                                    }
-                                    if (isEmailValid(email)) {
-                                        if (password.equals(confirmPassword)) {
-                                            if (password.length() >= 6) {
-                                                createUser(username, email, phone, kinder, password);
+                            if (!turn.isEmpty()) {
+                                if (!grade.isEmpty()) {
+                                    if (!group.isEmpty()) {
+                                        if (!password.isEmpty()) {
+                                            if (!confirmPassword.isEmpty()) {
+                                                if (mUsernameList != null && !mUsernameList.isEmpty()) {
+                                                    for (String s : mUsernameList) {
+                                                        if (s.equals(username)) {
+                                                            Snackbar.make(v, "Ya existe un docente con ese nombre", Snackbar.LENGTH_SHORT).show();
+                                                            return;
+                                                        }
+                                                    }
+                                                }
+                                                if (mPhoneList != null && !mPhoneList.isEmpty()) {
+                                                    for (String s : mPhoneList) {
+                                                        if (s.equals(phone)) {
+                                                            Snackbar.make(v, "Ya existe un docente con ese teléfono", Snackbar.LENGTH_SHORT).show();
+                                                            return;
+                                                        }
+                                                    }
+                                                }
+                                                if (isEmailValid(email)) {
+                                                    if (password.equals(confirmPassword)) {
+                                                        if (password.length() >= 6) {
+                                                            createUser(email, username, phone, turn, grade, group, password);
+                                                        } else {
+                                                            Snackbar.make(v, "La contraseña debe ser mayor o igual a 6 caracteres", Snackbar.LENGTH_SHORT).show();
+                                                        }
+                                                    } else {
+                                                        Snackbar.make(v, "Las contraseñas no coinciden", Snackbar.LENGTH_SHORT).show();
+                                                    }
+                                                } else {
+                                                    Snackbar.make(v, "Formato de correo electrónico inválido", Snackbar.LENGTH_SHORT).show();
+                                                }
                                             } else {
-                                                Snackbar.make(v, "La contraseña debe ser mayor o igual a 6 caracteres", Snackbar.LENGTH_SHORT).show();
+                                                Snackbar.make(v, "Debe confirmar su contraseña", Snackbar.LENGTH_SHORT).show();
                                             }
                                         } else {
-                                            Snackbar.make(v, "Las contraseñas no coinciden", Snackbar.LENGTH_SHORT).show();
+                                            Snackbar.make(v, "La contraseña es obligatoria", Snackbar.LENGTH_SHORT).show();
                                         }
                                     } else {
-                                        Snackbar.make(v, "Formato de correo electrónico inválido", Snackbar.LENGTH_SHORT).show();
+                                        Snackbar.make(v, "Debe seleccionar un grupo", Snackbar.LENGTH_SHORT).show();
                                     }
                                 } else {
-                                    Snackbar.make(v, "Debe confirmar su contraseña", Snackbar.LENGTH_SHORT).show();
+                                    Snackbar.make(v, "Debe seleccionar un grado", Snackbar.LENGTH_SHORT).show();
                                 }
                             } else {
-                                Snackbar.make(v, "La contraseña es obligatoria", Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(v, "Debe seleccionar un turno", Snackbar.LENGTH_SHORT).show();
                             }
                         } else {
                             Snackbar.make(v, "Debe seleccionar un jardín de niños", Snackbar.LENGTH_SHORT).show();
@@ -146,7 +177,7 @@ public class RegisterActivity extends AppCompatActivity {
         mImageViewBack.setOnClickListener(v -> finish());
     }
 
-    public void isUserInfoExist(List<String> stringList, String field) {
+    private void isUserInfoExist(ArrayList<String> stringList, String field) {
         mTeachersProvider.getAllTeacherDocuments().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
@@ -169,19 +200,21 @@ public class RegisterActivity extends AppCompatActivity {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
                     if (snapshot.exists()) {
-                        if (snapshot.contains("name")) {
+                        if (snapshot.contains("id") && snapshot.contains("name")) {
+                            String ids = snapshot.getString("id");
                             String names = snapshot.getString("name");
-                            kinderList.add(new Kinder(names, null));
+                            kinderList.add(new Kinder(ids, names, null, null));
                         }
                     }
                 }
                 ArrayAdapter<Kinder> arrayAdapter = new ArrayAdapter<>(RegisterActivity.this, android.R.layout.simple_dropdown_item_1line, kinderList);
-                mSpinner.setAdapter(arrayAdapter);
-                mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                mSpinnerKinder.setAdapter(arrayAdapter);
+                mSpinnerKinder.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         String kinder = parent.getItemAtPosition(position).toString().trim();
+                        mIdKinder = kinderList.get(position).getId().trim();
                         mTextViewKinderSelected.setText("J/N " + kinder);
                     }
 
@@ -195,17 +228,20 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    private void createUser(final String username, final String email, final String phone, final String kinder, final String password) {
+    private void createUser(String email, String username, String phone, String turn, String grade, String group, String password) {
         mDialog.show();
         mAuthProvider.register(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String id = mAuthProvider.getUid();
                 Teacher teacher = new Teacher();
                 teacher.setId(id);
+                teacher.setIdKinder(mIdKinder);
                 teacher.setEmail(email);
                 teacher.setTeachername(username);
                 teacher.setPhone(phone);
-                teacher.setKinder(kinder);
+                teacher.setTurn(turn);
+                teacher.setGrade(grade);
+                teacher.setGroup(group);
                 teacher.setTimestamp(new Date().getTime());
                 mTeachersProvider.create(teacher).addOnCompleteListener(task1 -> {
                     mDialog.dismiss();

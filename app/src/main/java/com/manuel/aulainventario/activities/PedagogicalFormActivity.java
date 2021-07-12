@@ -3,9 +3,6 @@ package com.manuel.aulainventario.activities;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -16,19 +13,17 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.manuel.aulainventario.R;
-import com.manuel.aulainventario.models.Condition;
 import com.manuel.aulainventario.models.Pedagogical;
 import com.manuel.aulainventario.providers.AuthProvider;
-import com.manuel.aulainventario.providers.ConditionsProvider;
+import com.manuel.aulainventario.providers.CollectionsProvider;
 import com.manuel.aulainventario.providers.PedagogicalProvider;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
+import static com.manuel.aulainventario.utils.Validations.getPositionItem;
 import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
 
 public class PedagogicalFormActivity extends AppCompatActivity {
@@ -38,10 +33,11 @@ public class PedagogicalFormActivity extends AppCompatActivity {
     Spinner mSpinnerP;
     MaterialButton mButtonClearP, mButtonAddP;
     AuthProvider mAuthProvider;
-    ConditionsProvider mConditionsProvider;
+    CollectionsProvider mCollectionsProvider;
     PedagogicalProvider mPedagogicalProvider;
     ProgressDialog mProgressDialog;
     String mExtraIdPedagogicalUpdate, mExtraPedagogicalTitle;
+    ArrayList<String> mConditionsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +52,15 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         mButtonClearP = findViewById(R.id.btnClearP);
         mButtonAddP = findViewById(R.id.btnAddP);
         mAuthProvider = new AuthProvider();
-        mConditionsProvider = new ConditionsProvider();
+        mCollectionsProvider = new CollectionsProvider(this, "Conditions");
         mPedagogicalProvider = new PedagogicalProvider();
+        mConditionsList = new ArrayList<>();
         mExtraIdPedagogicalUpdate = getIntent().getStringExtra("idPedagogicalUpdate");
         mExtraPedagogicalTitle = getIntent().getStringExtra("pedagogicalTitle");
         if (mExtraPedagogicalTitle != null && !mExtraPedagogicalTitle.isEmpty()) {
             setTitle("Editar registro " + mExtraPedagogicalTitle);
         } else {
-            setTitle("Nuevo registro");
+            setTitle("Nuevo técnico pedagógico");
         }
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setTitle("Guardando registro...");
@@ -73,7 +70,7 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         validateFieldsAsYouType(mEditTextNumberP, "El número es obligatorio");
         validateFieldsAsYouType(mEditTextDescriptionP, "La descripción es obligatoria");
         validateFieldsAsYouType(mEditTextAmountP, "La cantidad es obligatoria");
-        getAllConditions();
+        mCollectionsProvider.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mConditionsList, "condition", mSpinnerP, "Estado: ", mTextViewConditionSelectedP, "Error al obtener los estados");
         getDataFromAdapter();
         mButtonClearP.setOnClickListener(v -> cleanForm());
         mButtonAddP.setOnClickListener(v -> {
@@ -168,19 +165,7 @@ public class PedagogicalFormActivity extends AppCompatActivity {
                 if (documentSnapshot.contains("condition")) {
                     String condition = documentSnapshot.getString("condition");
                     mTextViewConditionSelectedP.setText(condition);
-                    if (condition != null) {
-                        switch (condition) {
-                            case "Bueno":
-                                mSpinnerP.setSelection(0);
-                                break;
-                            case "Malo":
-                                mSpinnerP.setSelection(1);
-                                break;
-                            case "Regular":
-                                mSpinnerP.setSelection(2);
-                                break;
-                        }
-                    }
+                    mSpinnerP.setSelection(getPositionItem(mSpinnerP, condition));
                 }
             }
         });
@@ -212,38 +197,6 @@ public class PedagogicalFormActivity extends AppCompatActivity {
                 Toast.makeText(this, "Registro editado", Toast.LENGTH_SHORT).show();
             } else {
                 Snackbar.make(coordinatorLayout, "Error al editar el registro", Snackbar.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    public void getAllConditions() {
-        List<Condition> conditionList = new ArrayList<>();
-        mConditionsProvider.getAllDocuments().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
-                    if (snapshot.exists()) {
-                        if (snapshot.contains("condition")) {
-                            String conditions = snapshot.getString("condition");
-                            conditionList.add(new Condition(conditions));
-                        }
-                    }
-                }
-                ArrayAdapter<Condition> arrayAdapter = new ArrayAdapter<>(PedagogicalFormActivity.this, android.R.layout.simple_dropdown_item_1line, conditionList);
-                mSpinnerP.setAdapter(arrayAdapter);
-                mSpinnerP.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        String condition = parent.getItemAtPosition(position).toString().trim();
-                        mTextViewConditionSelectedP.setText("Estado: " + condition);
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    }
-                });
-            } else {
-                Snackbar.make(coordinatorLayout, "Error al obtener los estados", Snackbar.LENGTH_SHORT).show();
             }
         });
     }

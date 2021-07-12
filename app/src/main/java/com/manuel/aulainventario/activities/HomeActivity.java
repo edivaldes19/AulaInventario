@@ -102,10 +102,12 @@ public class HomeActivity extends AppCompatActivity implements ConnectionReceive
             alert.setNegativeButton("Cancelar", (dialog, which) -> {
             });
             alert.show();
-        } else if (item.getItemId() == R.id.itemAcercaDe) {
+        } else if (item.getItemId() == R.id.itemAbout) {
             startActivity(new Intent(HomeActivity.this, InfoActivity.class));
-        } else if (item.getItemId() == R.id.itemContactanos) {
+        } else if (item.getItemId() == R.id.itemContactMe) {
             startActivity(new Intent(HomeActivity.this, ContactMeActivity.class));
+        } else if (item.getItemId() == R.id.itemMyProfile) {
+            startActivity(new Intent(HomeActivity.this, MyProfileActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

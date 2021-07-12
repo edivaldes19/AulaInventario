@@ -1,18 +1,21 @@
 package com.manuel.aulainventario.models;
 
 public class Teacher {
-    private String id, email, teachername, phone, kinder;
+    private String id, idKinder, email, teachername, phone, turn, grade, group;
     private long timestamp;
 
     public Teacher() {
     }
 
-    public Teacher(String id, String email, String teachername, String phone, String kinder, long timestamp) {
+    public Teacher(String id, String idKinder, String email, String teachername, String phone, String turn, String grade, String group, long timestamp) {
         this.id = id;
+        this.idKinder = idKinder;
         this.email = email;
         this.teachername = teachername;
         this.phone = phone;
-        this.kinder = kinder;
+        this.turn = turn;
+        this.grade = grade;
+        this.group = group;
         this.timestamp = timestamp;
     }
 
@@ -22,6 +25,14 @@ public class Teacher {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getIdKinder() {
+        return idKinder;
+    }
+
+    public void setIdKinder(String idKinder) {
+        this.idKinder = idKinder;
     }
 
     public String getEmail() {
@@ -48,12 +59,28 @@ public class Teacher {
         this.phone = phone;
     }
 
-    public String getKinder() {
-        return kinder;
+    public String getTurn() {
+        return turn;
     }
 
-    public void setKinder(String kinder) {
-        this.kinder = kinder;
+    public void setTurn(String turn) {
+        this.turn = turn;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 
     public long getTimestamp() {

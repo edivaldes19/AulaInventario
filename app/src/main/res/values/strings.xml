@@ -2,7 +2,7 @@
     <string name="app_name">Aula Inventario</string>
     <string name="default_web_client_id_google">82357836664-ah6h5pmoe4ca8pju1l6uu2khskunf7l6.apps.googleusercontent.com</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="teachername">Nombre y Apellido</string>
+    <string name="teachername">Nombre completo</string>
     <string name="email">Correo electrónico</string>
     <string name="welcome">Te damos la bienvenida educador(a)</string>
     <string name="password">Contraseña</string>
@@ -17,7 +17,7 @@
     <string name="registerNow">Registrate ahora</string>
     <string name="confirmPassword">Confirmar contraseña</string>
     <string name="registerMe">Registrarme</string>
-    <string name="direction">Dirección:</string>
+    <string name="direction">Dirección/Ubicación</string>
     <string name="delete">Eliminar</string>
     <string name="about">Acerca de</string>
     <string name="contactMe">Contáctame</string>
@@ -33,10 +33,27 @@
     <string name="sendForm">Enviar formulario</string>
     <string name="writeMessage">Escribe aquí tu mensaje</string>
     <string name="selectAReason">Seleccione un motivo:</string>
+    <string name="selectATurn">Seleccione un turno:</string>
+    <string name="selectAGrade">Grado:</string>
+    <string name="selectAGroup">Grupo:</string>
     <string name="currentVersion">Versión: 1.0.0</string>
     <string name="copyrightAndRelease">© Julio 2021 EdiVal</string>
     <string name="back">VOLVER</string>
-    <string name="key">Clave</string>
     <string name="price">Precio</string>
     <string name="total">Total</string>
+    <string name="seeMyInformation">Ver mi info.</string>
+    <string name="zone">Zona</string>
+    <string name="sector">Sector</string>
+    <string name="group">Grupo</string>
+    <string name="grade">Grado</string>
+    <string name="educator">Educador(a)</string>
+    <string name="kinder">Jardín de niños</string>
+    <string name="turn">Turno</string>
+    <string name="key">Clave</string>
+    <string name="lastUpdate">Última actualización:</string>
+    <string name="zoneValue">005</string>
+    <string name="sectorValue">08</string>
+    <string name="editInfo">Editar información</string>
+    <string name="editMyInformation">Editar mi información</string>
+    <string name="EditMe">Editar información</string>
 </resources>

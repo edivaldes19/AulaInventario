@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 public class AuthProvider {
-    private final FirebaseAuth mAuth;
+    FirebaseAuth mAuth;
 
     public AuthProvider() {
         mAuth = FirebaseAuth.getInstance();

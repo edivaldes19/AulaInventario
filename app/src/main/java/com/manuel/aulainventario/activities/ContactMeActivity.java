@@ -37,7 +37,7 @@ import static com.manuel.aulainventario.utils.Validations.isEmailValid;
 import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
 
 public class ContactMeActivity extends AppCompatActivity {
-    public static String affair;
+    public static String reason;
     CoordinatorLayout coordinatorLayout;
     ShapeableImageView mImageViewBack;
     TextInputEditText textInputUsernameForm, textInputEmailForm, textInputMessageForm;
@@ -83,7 +83,7 @@ public class ContactMeActivity extends AppCompatActivity {
                     if (isEmailValid(email)) {
                         if (!message.isEmpty()) {
                             if (materialRadioButtonComplain.isChecked() || materialRadioButtonSuggestion.isChecked()) {
-                                affair = materialRadioButton.getText().toString().trim();
+                                reason = materialRadioButton.getText().toString().trim();
                                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                                 StrictMode.setThreadPolicy(policy);
                                 Properties properties = new Properties();
@@ -101,7 +101,7 @@ public class ContactMeActivity extends AppCompatActivity {
                                 try {
                                     Message message = new MimeMessage(session);
                                     message.setFrom(new InternetAddress(email, name + " (" + email + ")"));
-                                    message.setSubject(affair + " de Aula Inventario");
+                                    message.setSubject(reason + " de Aula Inventario");
                                     message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailProject));
                                     message.setContent(this.message, "text/html; charset=utf-8");
                                     new SendMail().execute(message);
@@ -167,9 +167,9 @@ public class ContactMeActivity extends AppCompatActivity {
             super.onPostExecute(s);
             progressDialog.dismiss();
             if (s.equals("Éxito")) {
-                if (ContactMeActivity.affair.equals("Queja")) {
+                if (ContactMeActivity.reason.equals("Queja")) {
                     Toast.makeText(ContactMeActivity.this, "Gracias por su queja", Toast.LENGTH_LONG).show();
-                } else if (ContactMeActivity.affair.equals("Sugerencia")) {
+                } else if (ContactMeActivity.reason.equals("Sugerencia")) {
                     Toast.makeText(ContactMeActivity.this, "Gracias por su sugerencia", Toast.LENGTH_LONG).show();
                 }
                 finish();

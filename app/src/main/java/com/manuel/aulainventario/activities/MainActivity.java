@@ -35,6 +35,7 @@ import com.manuel.aulainventario.models.Teacher;
 import com.manuel.aulainventario.providers.AuthProvider;
 import com.manuel.aulainventario.providers.TeachersProvider;
 
+import java.util.Date;
 import java.util.Objects;
 
 import static com.manuel.aulainventario.utils.Validations.isEmailValid;
@@ -218,6 +219,13 @@ public class MainActivity extends AppCompatActivity {
                 Teacher teacher = new Teacher();
                 teacher.setId(id);
                 teacher.setEmail(email);
+                teacher.setIdKinder("");
+                teacher.setTeachername("");
+                teacher.setPhone("");
+                teacher.setTurn("");
+                teacher.setGrade("");
+                teacher.setGroup("");
+                teacher.setTimestamp(new Date().getTime());
                 mTeachersProvider.create(teacher).addOnCompleteListener(task -> {
                     progressDialog.dismiss();
                     if (task.isSuccessful()) {

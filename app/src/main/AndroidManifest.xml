@@ -14,6 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AulaInventario">
         <activity
+            android:name=".activities.MyProfileActivity"
+            android:parentActivityName=".activities.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AulaInventarioActionBar" />
+        <activity
             android:name=".activities.PedagogicalFormActivity"
             android:parentActivityName=".activities.HomeActivity"
             android:screenOrientation="portrait"
@@ -34,6 +39,9 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AulaInventarioActionBar" />
         <activity
+            android:name=".activities.EditInfoActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".activities.ContactMeActivity"
             android:screenOrientation="portrait" />
         <activity
@@ -45,6 +53,7 @@
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -2,7 +2,6 @@ package com.manuel.aulainventario.activities;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
@@ -31,18 +31,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import static com.manuel.aulainventario.utils.Validations.getPositionItem;
 import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
 
-public class CompleteProfileActivity extends AppCompatActivity {
+public class EditInfoActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
-    TextInputEditText mTextInputUsername, mTextInputPhone;
+    ShapeableImageView mImageViewBack;
+    TextInputEditText mTextInputTeachername, mTextInputPhone;
     MaterialTextView mTextViewKinderSelected, mTextViewTurnSelected, mTextViewGradeSelected, mTextViewGroupSelected;
     Spinner mSpinnerKinder, mSpinnerTurn, mSpinnerGrade, mSpinnerGroup;
-    MaterialButton materialButtonRegister;
+    MaterialButton mButtonEdit;
     AuthProvider mAuthProvider;
     TeachersProvider mTeachersProvider;
     KinderProvider mKinderProvider;
-    CollectionsProvider mCollectionsProviderShifts, mCollectionsProviderGrades, mCollectionsProviderGroups;
+    CollectionsProvider mCollectionsProviderKindergartens, mCollectionsProviderShifts, mCollectionsProviderGrades, mCollectionsProviderGroups;
     ProgressDialog mDialog;
     ArrayList<String> mUsernameList, mPhoneList, mShiftsList, mGradesList, mGroupsList;
     String mIdKinder;
@@ -50,22 +52,24 @@ public class CompleteProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_complete_profile);
-        coordinatorLayout = findViewById(R.id.coordinatorComplete);
-        mTextInputUsername = findViewById(R.id.textInputUsernameConfirm);
-        mTextInputPhone = findViewById(R.id.textInputPhone);
-        mTextViewKinderSelected = findViewById(R.id.textViewKinderSelectedC);
-        mTextViewTurnSelected = findViewById(R.id.textViewTurnSelectedC);
-        mTextViewGradeSelected = findViewById(R.id.textViewGradeSelectedC);
-        mTextViewGroupSelected = findViewById(R.id.textViewGroupSelectedC);
-        mSpinnerKinder = findViewById(R.id.spinnerKinderComplete);
-        mSpinnerTurn = findViewById(R.id.spinnerTurnComplete);
-        mSpinnerGrade = findViewById(R.id.spinnerGradeComplete);
-        mSpinnerGroup = findViewById(R.id.spinnerGroupComplete);
-        materialButtonRegister = findViewById(R.id.btnConfirm);
+        setContentView(R.layout.activity_edit_info);
+        coordinatorLayout = findViewById(R.id.coordinatorEdit);
+        mImageViewBack = findViewById(R.id.imageViewBack);
+        mTextInputTeachername = findViewById(R.id.textInputUsernameEdit);
+        mTextInputPhone = findViewById(R.id.textInputPhoneEdit);
+        mTextViewKinderSelected = findViewById(R.id.textViewKinderSelectedEdit);
+        mTextViewTurnSelected = findViewById(R.id.textViewTurnSelectedEdit);
+        mTextViewGradeSelected = findViewById(R.id.textViewGradeSelectedEdit);
+        mTextViewGroupSelected = findViewById(R.id.textViewGroupSelectedEdit);
+        mSpinnerKinder = findViewById(R.id.spinnerKinderEdit);
+        mSpinnerTurn = findViewById(R.id.spinnerTurnEdit);
+        mSpinnerGrade = findViewById(R.id.spinnerGradeEdit);
+        mSpinnerGroup = findViewById(R.id.spinnerGroupEdit);
+        mButtonEdit = findViewById(R.id.btnEdit);
         mAuthProvider = new AuthProvider();
         mTeachersProvider = new TeachersProvider();
         mKinderProvider = new KinderProvider();
+        mCollectionsProviderKindergartens = new CollectionsProvider(this, "Kindergartens");
         mCollectionsProviderShifts = new CollectionsProvider(this, "Shifts");
         mCollectionsProviderGrades = new CollectionsProvider(this, "Grades");
         mCollectionsProviderGroups = new CollectionsProvider(this, "Groups");
@@ -79,7 +83,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
         mDialog.setMessage("Por favor, espere un momento");
         mDialog.setCancelable(false);
         mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        validateFieldsAsYouType(mTextInputUsername, "El nombre y apellido es obligatorio");
+        validateFieldsAsYouType(mTextInputTeachername, "El nombre y apellido es obligatorio");
         validateFieldsAsYouType(mTextInputPhone, "El número de teléfono es obligatorio");
         isUserInfoExist(mUsernameList, "teachername");
         isUserInfoExist(mPhoneList, "phone");
@@ -87,8 +91,8 @@ public class CompleteProfileActivity extends AppCompatActivity {
         mCollectionsProviderGrades.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGradesList, "grade", mSpinnerGrade, "Grado: ", mTextViewGradeSelected, "Error al obtener los grados");
         mCollectionsProviderGroups.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGroupsList, "group", mSpinnerGroup, "Grupo: ", mTextViewGroupSelected, "Error al obtener los grupos");
         getAllKindergartens();
-        materialButtonRegister.setOnClickListener(v -> {
-            String username = Objects.requireNonNull(mTextInputUsername.getText()).toString().trim();
+        mButtonEdit.setOnClickListener(v -> {
+            String username = Objects.requireNonNull(mTextInputTeachername.getText()).toString().trim();
             String phone = Objects.requireNonNull(mTextInputPhone.getText()).toString().trim();
             String kinder = mSpinnerKinder.getSelectedItem().toString().trim();
             String turn = mSpinnerTurn.getSelectedItem().toString().trim();
@@ -101,6 +105,12 @@ public class CompleteProfileActivity extends AppCompatActivity {
                             if (!grade.isEmpty()) {
                                 if (!group.isEmpty()) {
                                     if (mUsernameList != null && !mUsernameList.isEmpty()) {
+                                        for (int i = 0; i < mUsernameList.size(); i++) {
+                                            if (mUsernameList.get(i).equals(username)) {
+                                                mUsernameList.remove(i);
+                                                break;
+                                            }
+                                        }
                                         for (String s : mUsernameList) {
                                             if (s.equals(username)) {
                                                 Snackbar.make(v, "Ya existe un docente con ese nombre", Snackbar.LENGTH_SHORT).show();
@@ -109,6 +119,12 @@ public class CompleteProfileActivity extends AppCompatActivity {
                                         }
                                     }
                                     if (mPhoneList != null && !mPhoneList.isEmpty()) {
+                                        for (int i = 0; i < mPhoneList.size(); i++) {
+                                            if (mPhoneList.get(i).equals(phone)) {
+                                                mPhoneList.remove(i);
+                                                break;
+                                            }
+                                        }
                                         for (String s : mPhoneList) {
                                             if (s.equals(phone)) {
                                                 Snackbar.make(v, "Ya existe un docente con ese teléfono", Snackbar.LENGTH_SHORT).show();
@@ -136,6 +152,52 @@ public class CompleteProfileActivity extends AppCompatActivity {
                 Snackbar.make(v, "El nombre y apellido es obligatorio", Snackbar.LENGTH_SHORT).show();
             }
         });
+        mImageViewBack.setOnClickListener(v -> finish());
+        getTeacher();
+    }
+
+    private void getTeacher() {
+        mTeachersProvider.getTeacher(mAuthProvider.getUid()).addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                if (documentSnapshot.contains("idKinder")) {
+                    String idKinder = documentSnapshot.getString("idKinder");
+                    if (idKinder != null) {
+                        mKinderProvider.getKindergartens(idKinder).addOnSuccessListener(documentSnapshot1 -> {
+                            if (documentSnapshot1.exists()) {
+                                if (documentSnapshot1.contains("name")) {
+                                    String name = documentSnapshot1.getString("name");
+                                    mTextViewKinderSelected.setText(name);
+                                    mSpinnerKinder.setSelection(getPositionItem(mSpinnerKinder, name));
+                                }
+                            }
+                        });
+                    }
+                }
+                if (documentSnapshot.contains("teachername")) {
+                    String teachername = documentSnapshot.getString("teachername");
+                    mTextInputTeachername.setText(teachername);
+                }
+                if (documentSnapshot.contains("phone")) {
+                    String phone = documentSnapshot.getString("phone");
+                    mTextInputPhone.setText(phone);
+                }
+                if (documentSnapshot.contains("turn")) {
+                    String turn = documentSnapshot.getString("turn");
+                    mTextViewTurnSelected.setText(turn);
+                    mSpinnerTurn.setSelection(getPositionItem(mSpinnerTurn, turn));
+                }
+                if (documentSnapshot.contains("grade")) {
+                    String grade = documentSnapshot.getString("grade");
+                    mTextViewGradeSelected.setText(grade);
+                    mSpinnerGrade.setSelection(getPositionItem(mSpinnerGrade, grade));
+                }
+                if (documentSnapshot.contains("group")) {
+                    String group = documentSnapshot.getString("group");
+                    mTextViewGroupSelected.setText(group);
+                    mSpinnerGroup.setSelection(getPositionItem(mSpinnerGroup, group));
+                }
+            }
+        });
     }
 
     private void isUserInfoExist(ArrayList<String> stringList, String field) {
@@ -155,7 +217,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
         });
     }
 
-    private void getAllKindergartens() {
+    public void getAllKindergartens() {
         List<Kinder> kinderList = new ArrayList<>();
         mKinderProvider.getAllDocuments().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -168,7 +230,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
                         }
                     }
                 }
-                ArrayAdapter<Kinder> arrayAdapter = new ArrayAdapter<>(CompleteProfileActivity.this, android.R.layout.simple_dropdown_item_1line, kinderList);
+                ArrayAdapter<Kinder> arrayAdapter = new ArrayAdapter<>(EditInfoActivity.this, android.R.layout.simple_dropdown_item_1line, kinderList);
                 mSpinnerKinder.setAdapter(arrayAdapter);
                 mSpinnerKinder.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @SuppressLint("SetTextI18n")
@@ -204,9 +266,8 @@ public class CompleteProfileActivity extends AppCompatActivity {
         mTeachersProvider.update(teacher).addOnCompleteListener(task1 -> {
             mDialog.dismiss();
             if (task1.isSuccessful()) {
-                startActivity(new Intent(CompleteProfileActivity.this, HomeActivity.class));
                 finish();
-                Toast.makeText(this, "Bienvenido(a) " + username, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Información actualizada", Toast.LENGTH_SHORT).show();
             } else {
                 Snackbar.make(coordinatorLayout, "Error al registrar el docente en la base de datos", Snackbar.LENGTH_SHORT).show();
             }

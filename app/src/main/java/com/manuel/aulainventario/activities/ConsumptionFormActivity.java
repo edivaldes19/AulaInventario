@@ -47,7 +47,7 @@ public class ConsumptionFormActivity extends AppCompatActivity {
         if (mExtraConsumptionTitle != null && !mExtraConsumptionTitle.isEmpty()) {
             setTitle("Editar registro " + mExtraConsumptionTitle);
         } else {
-            setTitle("Nuevo registro");
+            setTitle("Nuevo material de consumo");
         }
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setTitle("Guardando registro...");

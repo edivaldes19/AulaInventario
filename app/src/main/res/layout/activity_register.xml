@@ -83,12 +83,9 @@
                 android:textColorHint="@color/black"
                 app:boxBackgroundColor="@color/white"
                 app:counterEnabled="true"
-                app:counterMaxLength="20"
+                app:counterMaxLength="50"
                 app:counterTextColor="@color/black"
                 app:errorEnabled="true"
-                app:helperText="Ej. Manuel Valdes"
-                app:helperTextEnabled="true"
-                app:helperTextTextColor="@color/black"
                 app:placeholderTextColor="@color/black"
                 app:startIconDrawable="@drawable/ic_account_circle">
 
@@ -98,8 +95,7 @@
                     android:layout_height="wrap_content"
                     android:digits="ABCDEFGHIJKLMNÑOPQRSTUVWXYZÁÉÍÓÚabcdefghijklmnñopqrstuvwxyzáéíóú "
                     android:inputType="textPersonName|textMultiLine"
-                    android:maxLength="20"
-                    android:maxLines="2"
+                    android:maxLength="50"
                     android:textColor="@color/black"
                     android:textColorHint="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -126,8 +122,7 @@
                     android:layout_height="wrap_content"
                     android:digits="0123456789"
                     android:inputType="phone"
-                    android:maxLength="10"
-                    android:maxLines="1" />
+                    android:maxLength="10" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textview.MaterialTextView
@@ -135,7 +130,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="30dp"
                 android:text="@string/selectKinderGarden"
                 android:textAlignment="textStart"
@@ -158,6 +153,130 @@
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="30dp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/textViewTurnSelectedR"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="30dp"
+                android:text="@string/selectATurn"
+                android:textAlignment="textStart"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="30dp"
+                android:background="@color/gray" />
+
+            <Spinner
+                android:id="@+id/spinnerTurnRegister"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="30dp" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="30dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="25dp"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/textViewGradeSelectedR"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="30dp"
+                            android:layout_marginTop="15dp"
+                            android:layout_marginEnd="30dp"
+                            android:text="@string/selectAGrade"
+                            android:textAlignment="textStart"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="30dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="30dp"
+                            android:background="@color/gray" />
+
+                        <Spinner
+                            android:id="@+id/spinnerGradeRegister"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="30dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="30dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/black" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="25dp"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/textViewGroupSelectedR"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="30dp"
+                            android:layout_marginTop="15dp"
+                            android:layout_marginEnd="30dp"
+                            android:text="@string/selectAGroup"
+                            android:textAlignment="textStart"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="30dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="30dp"
+                            android:background="@color/gray" />
+
+                        <Spinner
+                            android:id="@+id/spinnerGroupRegister"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="30dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="30dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </HorizontalScrollView>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -184,7 +303,6 @@
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress|textMultiLine"
                     android:maxLength="30"
-                    android:maxLines="3"
                     android:textColor="@color/black"
                     android:textColorHint="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -212,7 +330,6 @@
                     android:layout_height="wrap_content"
                     android:inputType="textPassword|textMultiLine"
                     android:maxLength="15"
-                    android:maxLines="2"
                     android:textColor="@color/black"
                     android:textColorHint="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -240,7 +357,6 @@
                     android:layout_height="wrap_content"
                     android:inputType="textPassword|textMultiLine"
                     android:maxLength="15"
-                    android:maxLines="2"
                     android:textColor="@color/black"
                     android:textColorHint="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>

@@ -2,11 +2,11 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/coordinatorComplete"
+    android:id="@+id/coordinatorEdit"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".activities.CompleteProfileActivity">
+    tools:context=".activities.EditInfoActivity">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -20,7 +20,7 @@
             <io.github.florent37.shapeofview.shapes.ArcView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:elevation="4dp"
+                android:elevation="5dp"
                 app:shape_arc_height="20dp"
                 app:shape_arc_position="bottom">
 
@@ -35,39 +35,50 @@
                     android:layout_gravity="top|center"
                     android:layout_margin="20dp">
 
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/textViewComplete"
-                        android:layout_width="0dp"
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/imageViewBack"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/fillIformation"
-                        android:textAlignment="center"
-                        android:textColor="@color/white"
-                        android:textSize="24sp"
-                        app:layout_constraintBottom_toTopOf="@id/imageViewVerifiedUser"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:src="@drawable/ic_arrow_back"
+                        app:layout_constraintBottom_toBottomOf="@id/textViewEditMyInfo"
+                        app:layout_constraintEnd_toStartOf="@id/textViewEditMyInfo"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/textViewEditMyInfo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/editMyInformation"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="24sp"
+                        app:layout_constraintBottom_toTopOf="@id/imageViewEditMyInfo"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/imageViewBack"
+                        app:layout_constraintTop_toTopOf="parent" />
+
                     <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/imageViewVerifiedUser"
+                        android:id="@+id/imageViewEditMyInfo"
                         android:layout_width="0dp"
                         android:layout_height="150dp"
                         android:layout_gravity="center"
                         android:layout_marginTop="20dp"
-                        android:src="@drawable/ic_fill_info"
+                        android:src="@drawable/ic_manage_accounts"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/textViewComplete" />
+                        app:layout_constraintTop_toBottomOf="@id/textViewEditMyInfo" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </io.github.florent37.shapeofview.shapes.ArcView>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
                 android:layout_marginTop="50dp"
-                android:layout_marginRight="30dp"
+                android:layout_marginEnd="30dp"
                 android:hint="@string/teachername"
                 android:textColorHint="@color/black"
                 app:boxBackgroundColor="@color/white"
@@ -79,7 +90,7 @@
                 app:startIconDrawable="@drawable/ic_account_circle">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/textInputUsernameConfirm"
+                    android:id="@+id/textInputUsernameEdit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="ABCDEFGHIJKLMNÑOPQRSTUVWXYZÁÉÍÓÚabcdefghijklmnñopqrstuvwxyzáéíóú "
@@ -101,11 +112,12 @@
                 app:counterEnabled="true"
                 app:counterMaxLength="10"
                 app:counterTextColor="@color/black"
+                app:errorEnabled="true"
                 app:placeholderTextColor="@color/black"
                 app:startIconDrawable="@drawable/ic_contact_phone">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/textInputPhone"
+                    android:id="@+id/textInputPhoneEdit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="0123456789"
@@ -114,11 +126,11 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/textViewKinderSelectedC"
+                android:id="@+id/textViewKinderSelectedEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="30dp"
                 android:text="@string/selectKinderGarden"
                 android:textAlignment="textStart"
@@ -135,7 +147,7 @@
                 android:background="@color/gray" />
 
             <Spinner
-                android:id="@+id/spinnerKinderComplete"
+                android:id="@+id/spinnerKinderEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
@@ -143,7 +155,7 @@
                 android:layout_marginEnd="30dp" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/textViewTurnSelectedC"
+                android:id="@+id/textViewTurnSelectedEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
@@ -164,7 +176,7 @@
                 android:background="@color/gray" />
 
             <Spinner
-                android:id="@+id/spinnerTurnComplete"
+                android:id="@+id/spinnerTurnEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
@@ -193,7 +205,7 @@
                         android:orientation="vertical">
 
                         <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/textViewGradeSelectedC"
+                            android:id="@+id/textViewGradeSelectedEdit"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="30dp"
@@ -214,7 +226,7 @@
                             android:background="@color/gray" />
 
                         <Spinner
-                            android:id="@+id/spinnerGradeComplete"
+                            android:id="@+id/spinnerGradeEdit"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="30dp"
@@ -235,7 +247,7 @@
                         android:orientation="vertical">
 
                         <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/textViewGroupSelectedC"
+                            android:id="@+id/textViewGroupSelectedEdit"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="30dp"
@@ -256,7 +268,7 @@
                             android:background="@color/gray" />
 
                         <Spinner
-                            android:id="@+id/spinnerGroupComplete"
+                            android:id="@+id/spinnerGroupEdit"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="30dp"
@@ -267,18 +279,17 @@
             </HorizontalScrollView>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnConfirm"
+                android:id="@+id/btnEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_margin="30dp"
                 android:backgroundTint="@color/colorPrimary"
-                android:text="@string/confirmInfo"
+                android:text="@string/EditMe"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 app:backgroundTintMode="screen"
                 app:cornerRadius="100dp"
-                app:errorEnabled="true"
                 app:icon="@drawable/ic_confirm"
                 app:iconTint="@color/white" />
         </LinearLayout>

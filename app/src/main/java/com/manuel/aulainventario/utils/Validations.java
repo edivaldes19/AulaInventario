@@ -2,6 +2,7 @@ package com.manuel.aulainventario.utils;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.widget.Spinner;
 
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -57,5 +58,15 @@ public class Validations {
             public void afterTextChanged(Editable editable) {
             }
         });
+    }
+
+    public static int getPositionItem(Spinner spinner, String field) {
+        int position = 0;
+        for (int i = 0; i < spinner.getCount(); i++) {
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(field)) {
+                position = i;
+            }
+        }
+        return position;
     }
 }
