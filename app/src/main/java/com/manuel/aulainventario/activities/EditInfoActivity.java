@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static com.manuel.aulainventario.utils.Validations.getPositionItem;
 import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
 
 public class EditInfoActivity extends AppCompatActivity {
@@ -167,7 +166,12 @@ public class EditInfoActivity extends AppCompatActivity {
                                 if (documentSnapshot1.contains("name")) {
                                     String name = documentSnapshot1.getString("name");
                                     mTextViewKinderSelected.setText(name);
-                                    mSpinnerKinder.setSelection(getPositionItem(mSpinnerKinder, name));
+                                    for (int i = 0; i < mSpinnerKinder.getCount(); i++) {
+                                        if (mSpinnerKinder.getItemAtPosition(i).toString().equalsIgnoreCase(name)) {
+                                            mSpinnerKinder.setSelection(i);
+                                            break;
+                                        }
+                                    }
                                 }
                             }
                         });
@@ -184,17 +188,32 @@ public class EditInfoActivity extends AppCompatActivity {
                 if (documentSnapshot.contains("turn")) {
                     String turn = documentSnapshot.getString("turn");
                     mTextViewTurnSelected.setText(turn);
-                    mSpinnerTurn.setSelection(getPositionItem(mSpinnerTurn, turn));
+                    for (int i = 0; i < mSpinnerTurn.getCount(); i++) {
+                        if (mSpinnerTurn.getItemAtPosition(i).toString().equalsIgnoreCase(turn)) {
+                            mSpinnerTurn.setSelection(i);
+                            break;
+                        }
+                    }
                 }
                 if (documentSnapshot.contains("grade")) {
                     String grade = documentSnapshot.getString("grade");
                     mTextViewGradeSelected.setText(grade);
-                    mSpinnerGrade.setSelection(getPositionItem(mSpinnerGrade, grade));
+                    for (int i = 0; i < mSpinnerGrade.getCount(); i++) {
+                        if (mSpinnerGrade.getItemAtPosition(i).toString().equalsIgnoreCase(grade)) {
+                            mSpinnerGrade.setSelection(i);
+                            break;
+                        }
+                    }
                 }
                 if (documentSnapshot.contains("group")) {
                     String group = documentSnapshot.getString("group");
                     mTextViewGroupSelected.setText(group);
-                    mSpinnerGroup.setSelection(getPositionItem(mSpinnerGroup, group));
+                    for (int i = 0; i < mSpinnerGroup.getCount(); i++) {
+                        if (mSpinnerGroup.getItemAtPosition(i).toString().equalsIgnoreCase(group)) {
+                            mSpinnerGroup.setSelection(i);
+                            break;
+                        }
+                    }
                 }
             }
         });

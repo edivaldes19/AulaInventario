@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.manuel.aulainventario.utils.Validations.getPositionItem;
 import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
 
 public class ActiveFormActivity extends AppCompatActivity {
@@ -219,7 +218,12 @@ public class ActiveFormActivity extends AppCompatActivity {
                 if (documentSnapshot.contains("condition")) {
                     String condition = documentSnapshot.getString("condition");
                     mTextViewConditionSelectedA.setText(condition);
-                    mSpinnerA.setSelection(getPositionItem(mSpinnerA, condition));
+                    for (int i = 0; i < mSpinnerA.getCount(); i++) {
+                        if (mSpinnerA.getItemAtPosition(i).toString().equalsIgnoreCase(condition)) {
+                            mSpinnerA.setSelection(i);
+                            break;
+                        }
+                    }
                 }
             }
         });
