@@ -1,18 +1,19 @@
 package com.manuel.aulainventario.models;
 
 public class Active {
-    private long number, amount, price, total, timestamp;
+    private long number, amount, timestamp;
+    private double price, total;
     private String id, idTeacher, key, description, condition;
 
     public Active() {
     }
 
-    public Active(long number, long amount, long price, long total, long timestamp, String id, String idTeacher, String key, String description, String condition) {
+    public Active(long number, long amount, long timestamp, double price, double total, String id, String idTeacher, String key, String description, String condition) {
         this.number = number;
         this.amount = amount;
+        this.timestamp = timestamp;
         this.price = price;
         this.total = total;
-        this.timestamp = timestamp;
         this.id = id;
         this.idTeacher = idTeacher;
         this.key = key;
@@ -36,28 +37,28 @@ public class Active {
         this.amount = amount;
     }
 
-    public long getPrice() {
-        return price;
-    }
-
-    public void setPrice(long price) {
-        this.price = price;
-    }
-
-    public long getTotal() {
-        return total;
-    }
-
-    public void setTotal(long total) {
-        this.total = total;
-    }
-
     public long getTimestamp() {
         return timestamp;
     }
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
     }
 
     public String getId() {

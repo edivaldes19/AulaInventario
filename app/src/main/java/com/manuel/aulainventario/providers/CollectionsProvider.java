@@ -22,11 +22,11 @@ import java.util.Objects;
 public class CollectionsProvider {
     CollectionReference mCollection;
     Context mContext;
-    String nameCollection;
+    String mNameCollection;
 
     public CollectionsProvider(Context context, String collection) {
         this.mContext = context;
-        this.nameCollection = collection;
+        this.mNameCollection = collection;
         mCollection = FirebaseFirestore.getInstance().collection(collection);
     }
 

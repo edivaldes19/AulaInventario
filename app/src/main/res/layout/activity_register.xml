@@ -90,7 +90,7 @@
                 app:startIconDrawable="@drawable/ic_account_circle">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/textInputUsernameR"
+                    android:id="@+id/textInputTeachernameR"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="ABCDEFGHIJKLMNÑOPQRSTUVWXYZÁÉÍÓÚabcdefghijklmnñopqrstuvwxyzáéíóú "

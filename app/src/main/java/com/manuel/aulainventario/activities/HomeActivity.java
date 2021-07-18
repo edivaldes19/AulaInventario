@@ -24,30 +24,30 @@ import com.manuel.aulainventario.providers.AuthProvider;
 import com.manuel.aulainventario.utils.ConnectionReceiver;
 
 public class HomeActivity extends AppCompatActivity implements ConnectionReceiver.ReceiverListener {
-    TabLayout tabLayout;
-    ViewPager2 viewPager2;
-    FragmentAdapter fragmentAdapter;
-    AuthProvider authProvider;
+    TabLayout mTabLayout;
+    ViewPager2 mViewPager2;
+    FragmentAdapter mFragmentAdapter;
+    AuthProvider mAuthProvider;
     boolean isPressed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        tabLayout = findViewById(R.id.tabLayout);
-        viewPager2 = findViewById(R.id.viewPager);
-        authProvider = new AuthProvider();
+        mTabLayout = findViewById(R.id.tabLayout);
+        mViewPager2 = findViewById(R.id.viewPager);
+        mAuthProvider = new AuthProvider();
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentAdapter = new FragmentAdapter(fragmentManager, getLifecycle());
-        viewPager2.setAdapter(fragmentAdapter);
-        tabLayout.addTab(tabLayout.newTab().setText("Técnico Pedagógico"));
-        tabLayout.addTab(tabLayout.newTab().setText("Material Didáctico"));
-        tabLayout.addTab(tabLayout.newTab().setText("Material de Consumo"));
-        tabLayout.addTab(tabLayout.newTab().setText("Activo Fijo"));
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        mFragmentAdapter = new FragmentAdapter(fragmentManager, getLifecycle());
+        mViewPager2.setAdapter(mFragmentAdapter);
+        mTabLayout.addTab(mTabLayout.newTab().setText("Técnico Pedagógico"));
+        mTabLayout.addTab(mTabLayout.newTab().setText("Material Didáctico"));
+        mTabLayout.addTab(mTabLayout.newTab().setText("Material de Consumo"));
+        mTabLayout.addTab(mTabLayout.newTab().setText("Activo Fijo"));
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                viewPager2.setCurrentItem(tab.getPosition());
+                mViewPager2.setCurrentItem(tab.getPosition());
             }
 
             @Override
@@ -58,10 +58,10 @@ public class HomeActivity extends AppCompatActivity implements ConnectionReceive
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
-        viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+        mViewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-                tabLayout.selectTab(tabLayout.getTabAt(position));
+                mTabLayout.selectTab(mTabLayout.getTabAt(position));
             }
         });
         checkConnection();
@@ -108,12 +108,14 @@ public class HomeActivity extends AppCompatActivity implements ConnectionReceive
             startActivity(new Intent(HomeActivity.this, ContactMeActivity.class));
         } else if (item.getItemId() == R.id.itemMyProfile) {
             startActivity(new Intent(HomeActivity.this, MyProfileActivity.class));
+        } else if (item.getItemId() == R.id.itemMap) {
+            startActivity(new Intent(HomeActivity.this, MapsActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void logout() {
-        authProvider.logout();
+        mAuthProvider.logout();
         Intent intent = new Intent(HomeActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

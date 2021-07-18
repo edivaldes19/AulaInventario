@@ -1,7 +1,9 @@
 package com.manuel.aulainventario.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -45,12 +47,13 @@ public class MyProfileActivity extends AppCompatActivity {
         getTeacher();
     }
 
+    @SuppressLint("SetTextI18n")
     private void getTeacher() {
         mTeachersProvider.getTeacher(mAuthProvider.getUid()).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("idKinder")) {
                     String idKinder = documentSnapshot.getString("idKinder");
-                    if (idKinder != null) {
+                    if (!TextUtils.isEmpty(idKinder)) {
                         mKinderProvider.getKindergartens(idKinder).addOnSuccessListener(documentSnapshot2 -> {
                             if (documentSnapshot2.exists()) {
                                 if (documentSnapshot2.contains("name")) {
@@ -87,11 +90,11 @@ public class MyProfileActivity extends AppCompatActivity {
                 }
                 if (documentSnapshot.contains("grade")) {
                     String grade = documentSnapshot.getString("grade");
-                    mTextViewGrade.setText(grade);
+                    mTextViewGrade.setText(grade + "°");
                 }
                 if (documentSnapshot.contains("group")) {
                     String group = documentSnapshot.getString("group");
-                    mTextViewGroup.setText(group);
+                    mTextViewGroup.setText("\"" + group + "\"");
                 }
                 if (documentSnapshot.contains("timestamp")) {
                     long timestamp = documentSnapshot.getLong("timestamp");

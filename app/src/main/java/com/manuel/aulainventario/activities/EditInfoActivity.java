@@ -3,6 +3,7 @@ package com.manuel.aulainventario.activities;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -31,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import static com.manuel.aulainventario.utils.Validations.getLastPositionOfASpinner;
 import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
 
 public class EditInfoActivity extends AppCompatActivity {
@@ -45,7 +47,7 @@ public class EditInfoActivity extends AppCompatActivity {
     KinderProvider mKinderProvider;
     CollectionsProvider mCollectionsProviderKindergartens, mCollectionsProviderShifts, mCollectionsProviderGrades, mCollectionsProviderGroups;
     ProgressDialog mDialog;
-    ArrayList<String> mUsernameList, mPhoneList, mShiftsList, mGradesList, mGroupsList;
+    ArrayList<String> mTeachernameList, mPhoneList, mShiftsList, mGradesList, mGroupsList;
     String mIdKinder;
 
     @Override
@@ -54,7 +56,7 @@ public class EditInfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_info);
         coordinatorLayout = findViewById(R.id.coordinatorEdit);
         mImageViewBack = findViewById(R.id.imageViewBack);
-        mTextInputTeachername = findViewById(R.id.textInputUsernameEdit);
+        mTextInputTeachername = findViewById(R.id.textInputTeachernameEdit);
         mTextInputPhone = findViewById(R.id.textInputPhoneEdit);
         mTextViewKinderSelected = findViewById(R.id.textViewKinderSelectedEdit);
         mTextViewTurnSelected = findViewById(R.id.textViewTurnSelectedEdit);
@@ -72,7 +74,7 @@ public class EditInfoActivity extends AppCompatActivity {
         mCollectionsProviderShifts = new CollectionsProvider(this, "Shifts");
         mCollectionsProviderGrades = new CollectionsProvider(this, "Grades");
         mCollectionsProviderGroups = new CollectionsProvider(this, "Groups");
-        mUsernameList = new ArrayList<>();
+        mTeachernameList = new ArrayList<>();
         mPhoneList = new ArrayList<>();
         mShiftsList = new ArrayList<>();
         mGradesList = new ArrayList<>();
@@ -84,34 +86,34 @@ public class EditInfoActivity extends AppCompatActivity {
         mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         validateFieldsAsYouType(mTextInputTeachername, "El nombre y apellido es obligatorio");
         validateFieldsAsYouType(mTextInputPhone, "El número de teléfono es obligatorio");
-        isUserInfoExist(mUsernameList, "teachername");
+        isUserInfoExist(mTeachernameList, "teachername");
         isUserInfoExist(mPhoneList, "phone");
         mCollectionsProviderShifts.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mShiftsList, "turn", mSpinnerTurn, "Turno: ", mTextViewTurnSelected, "Error al obtener los turnos");
         mCollectionsProviderGrades.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGradesList, "grade", mSpinnerGrade, "Grado: ", mTextViewGradeSelected, "Error al obtener los grados");
         mCollectionsProviderGroups.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGroupsList, "group", mSpinnerGroup, "Grupo: ", mTextViewGroupSelected, "Error al obtener los grupos");
         getAllKindergartens();
         mButtonEdit.setOnClickListener(v -> {
-            String username = Objects.requireNonNull(mTextInputTeachername.getText()).toString().trim();
+            String teachername = Objects.requireNonNull(mTextInputTeachername.getText()).toString().trim();
             String phone = Objects.requireNonNull(mTextInputPhone.getText()).toString().trim();
             String kinder = mSpinnerKinder.getSelectedItem().toString().trim();
             String turn = mSpinnerTurn.getSelectedItem().toString().trim();
             String grade = mSpinnerGrade.getSelectedItem().toString().trim();
             String group = mSpinnerGroup.getSelectedItem().toString().trim();
-            if (!username.isEmpty()) {
-                if (!phone.isEmpty()) {
-                    if (!kinder.isEmpty()) {
-                        if (!turn.isEmpty()) {
-                            if (!grade.isEmpty()) {
-                                if (!group.isEmpty()) {
-                                    if (mUsernameList != null && !mUsernameList.isEmpty()) {
-                                        for (int i = 0; i < mUsernameList.size(); i++) {
-                                            if (mUsernameList.get(i).equals(username)) {
-                                                mUsernameList.remove(i);
+            if (!TextUtils.isEmpty(teachername)) {
+                if (!TextUtils.isEmpty(phone)) {
+                    if (!TextUtils.isEmpty(kinder)) {
+                        if (!TextUtils.isEmpty(turn)) {
+                            if (!TextUtils.isEmpty(grade)) {
+                                if (!TextUtils.isEmpty(group)) {
+                                    if (mTeachernameList != null && !mTeachernameList.isEmpty()) {
+                                        for (int i = 0; i < mTeachernameList.size(); i++) {
+                                            if (mTeachernameList.get(i).equals(teachername)) {
+                                                mTeachernameList.remove(i);
                                                 break;
                                             }
                                         }
-                                        for (String s : mUsernameList) {
-                                            if (s.equals(username)) {
+                                        for (String s : mTeachernameList) {
+                                            if (s.equals(teachername)) {
                                                 Snackbar.make(v, "Ya existe un docente con ese nombre", Snackbar.LENGTH_SHORT).show();
                                                 return;
                                             }
@@ -131,7 +133,7 @@ public class EditInfoActivity extends AppCompatActivity {
                                             }
                                         }
                                     }
-                                    updateUser(username, phone, turn, grade, group);
+                                    updateUser(teachername, phone, turn, grade, group);
                                 } else {
                                     Snackbar.make(v, "Debe seleccionar un grupo", Snackbar.LENGTH_SHORT).show();
                                 }
@@ -155,23 +157,19 @@ public class EditInfoActivity extends AppCompatActivity {
         getTeacher();
     }
 
+    @SuppressLint("SetTextI18n")
     private void getTeacher() {
         mTeachersProvider.getTeacher(mAuthProvider.getUid()).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("idKinder")) {
                     String idKinder = documentSnapshot.getString("idKinder");
-                    if (idKinder != null) {
+                    if (!TextUtils.isEmpty(idKinder)) {
                         mKinderProvider.getKindergartens(idKinder).addOnSuccessListener(documentSnapshot1 -> {
                             if (documentSnapshot1.exists()) {
                                 if (documentSnapshot1.contains("name")) {
                                     String name = documentSnapshot1.getString("name");
                                     mTextViewKinderSelected.setText(name);
-                                    for (int i = 0; i < mSpinnerKinder.getCount(); i++) {
-                                        if (mSpinnerKinder.getItemAtPosition(i).toString().equalsIgnoreCase(name)) {
-                                            mSpinnerKinder.setSelection(i);
-                                            break;
-                                        }
-                                    }
+                                    mSpinnerKinder.setSelection(getLastPositionOfASpinner(mSpinnerKinder, name));
                                 }
                             }
                         });
@@ -187,33 +185,15 @@ public class EditInfoActivity extends AppCompatActivity {
                 }
                 if (documentSnapshot.contains("turn")) {
                     String turn = documentSnapshot.getString("turn");
-                    mTextViewTurnSelected.setText(turn);
-                    for (int i = 0; i < mSpinnerTurn.getCount(); i++) {
-                        if (mSpinnerTurn.getItemAtPosition(i).toString().equalsIgnoreCase(turn)) {
-                            mSpinnerTurn.setSelection(i);
-                            break;
-                        }
-                    }
+                    mSpinnerTurn.setSelection(getLastPositionOfASpinner(mSpinnerTurn, turn));
                 }
                 if (documentSnapshot.contains("grade")) {
                     String grade = documentSnapshot.getString("grade");
-                    mTextViewGradeSelected.setText(grade);
-                    for (int i = 0; i < mSpinnerGrade.getCount(); i++) {
-                        if (mSpinnerGrade.getItemAtPosition(i).toString().equalsIgnoreCase(grade)) {
-                            mSpinnerGrade.setSelection(i);
-                            break;
-                        }
-                    }
+                    mSpinnerGrade.setSelection(getLastPositionOfASpinner(mSpinnerGrade, grade));
                 }
                 if (documentSnapshot.contains("group")) {
                     String group = documentSnapshot.getString("group");
-                    mTextViewGroupSelected.setText(group);
-                    for (int i = 0; i < mSpinnerGroup.getCount(); i++) {
-                        if (mSpinnerGroup.getItemAtPosition(i).toString().equalsIgnoreCase(group)) {
-                            mSpinnerGroup.setSelection(i);
-                            break;
-                        }
-                    }
+                    mSpinnerGroup.setSelection(getLastPositionOfASpinner(mSpinnerGroup, group));
                 }
             }
         });
@@ -270,12 +250,12 @@ public class EditInfoActivity extends AppCompatActivity {
         });
     }
 
-    private void updateUser(String username, String phone, String turn, String grade, String group) {
+    private void updateUser(String teachername, String phone, String turn, String grade, String group) {
         String id = mAuthProvider.getUid();
         Teacher teacher = new Teacher();
         teacher.setId(id);
         teacher.setIdKinder(mIdKinder);
-        teacher.setTeachername(username);
+        teacher.setTeachername(teachername);
         teacher.setPhone(phone);
         teacher.setTurn(turn);
         teacher.setGrade(grade);

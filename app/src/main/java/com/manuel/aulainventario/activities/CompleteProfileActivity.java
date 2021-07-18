@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -35,7 +36,7 @@ import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouTyp
 
 public class CompleteProfileActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
-    TextInputEditText mTextInputUsername, mTextInputPhone;
+    TextInputEditText mTextInputTeachername, mTextInputPhone;
     MaterialTextView mTextViewKinderSelected, mTextViewTurnSelected, mTextViewGradeSelected, mTextViewGroupSelected;
     Spinner mSpinnerKinder, mSpinnerTurn, mSpinnerGrade, mSpinnerGroup;
     MaterialButton materialButtonRegister;
@@ -44,7 +45,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
     KinderProvider mKinderProvider;
     CollectionsProvider mCollectionsProviderShifts, mCollectionsProviderGrades, mCollectionsProviderGroups;
     ProgressDialog mDialog;
-    ArrayList<String> mUsernameList, mPhoneList, mShiftsList, mGradesList, mGroupsList;
+    ArrayList<String> mTeachernameList, mPhoneList, mShiftsList, mGradesList, mGroupsList;
     String mIdKinder;
 
     @Override
@@ -52,7 +53,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complete_profile);
         coordinatorLayout = findViewById(R.id.coordinatorComplete);
-        mTextInputUsername = findViewById(R.id.textInputUsernameConfirm);
+        mTextInputTeachername = findViewById(R.id.textInputTeachernameConfirm);
         mTextInputPhone = findViewById(R.id.textInputPhone);
         mTextViewKinderSelected = findViewById(R.id.textViewKinderSelectedC);
         mTextViewTurnSelected = findViewById(R.id.textViewTurnSelectedC);
@@ -69,7 +70,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
         mCollectionsProviderShifts = new CollectionsProvider(this, "Shifts");
         mCollectionsProviderGrades = new CollectionsProvider(this, "Grades");
         mCollectionsProviderGroups = new CollectionsProvider(this, "Groups");
-        mUsernameList = new ArrayList<>();
+        mTeachernameList = new ArrayList<>();
         mPhoneList = new ArrayList<>();
         mShiftsList = new ArrayList<>();
         mGradesList = new ArrayList<>();
@@ -79,30 +80,30 @@ public class CompleteProfileActivity extends AppCompatActivity {
         mDialog.setMessage("Por favor, espere un momento");
         mDialog.setCancelable(false);
         mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        validateFieldsAsYouType(mTextInputUsername, "El nombre y apellido es obligatorio");
+        validateFieldsAsYouType(mTextInputTeachername, "El nombre y apellido es obligatorio");
         validateFieldsAsYouType(mTextInputPhone, "El número de teléfono es obligatorio");
-        isUserInfoExist(mUsernameList, "teachername");
+        isUserInfoExist(mTeachernameList, "teachername");
         isUserInfoExist(mPhoneList, "phone");
         mCollectionsProviderShifts.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mShiftsList, "turn", mSpinnerTurn, "Turno: ", mTextViewTurnSelected, "Error al obtener los turnos");
         mCollectionsProviderGrades.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGradesList, "grade", mSpinnerGrade, "Grado: ", mTextViewGradeSelected, "Error al obtener los grados");
         mCollectionsProviderGroups.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGroupsList, "group", mSpinnerGroup, "Grupo: ", mTextViewGroupSelected, "Error al obtener los grupos");
         getAllKindergartens();
         materialButtonRegister.setOnClickListener(v -> {
-            String username = Objects.requireNonNull(mTextInputUsername.getText()).toString().trim();
+            String teachername = Objects.requireNonNull(mTextInputTeachername.getText()).toString().trim();
             String phone = Objects.requireNonNull(mTextInputPhone.getText()).toString().trim();
             String kinder = mSpinnerKinder.getSelectedItem().toString().trim();
             String turn = mSpinnerTurn.getSelectedItem().toString().trim();
             String grade = mSpinnerGrade.getSelectedItem().toString().trim();
             String group = mSpinnerGroup.getSelectedItem().toString().trim();
-            if (!username.isEmpty()) {
-                if (!phone.isEmpty()) {
-                    if (!kinder.isEmpty()) {
-                        if (!turn.isEmpty()) {
-                            if (!grade.isEmpty()) {
-                                if (!group.isEmpty()) {
-                                    if (mUsernameList != null && !mUsernameList.isEmpty()) {
-                                        for (String s : mUsernameList) {
-                                            if (s.equals(username)) {
+            if (!TextUtils.isEmpty(teachername)) {
+                if (!TextUtils.isEmpty(phone)) {
+                    if (!TextUtils.isEmpty(kinder)) {
+                        if (!TextUtils.isEmpty(turn)) {
+                            if (!TextUtils.isEmpty(grade)) {
+                                if (!TextUtils.isEmpty(group)) {
+                                    if (mTeachernameList != null && !mTeachernameList.isEmpty()) {
+                                        for (String s : mTeachernameList) {
+                                            if (s.equals(teachername)) {
                                                 Snackbar.make(v, "Ya existe un docente con ese nombre", Snackbar.LENGTH_SHORT).show();
                                                 return;
                                             }
@@ -116,7 +117,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
                                             }
                                         }
                                     }
-                                    updateUser(username, phone, turn, grade, group);
+                                    updateTeacher(teachername, phone, turn, grade, group);
                                 } else {
                                     Snackbar.make(v, "Debe seleccionar un grupo", Snackbar.LENGTH_SHORT).show();
                                 }
@@ -189,12 +190,12 @@ public class CompleteProfileActivity extends AppCompatActivity {
         });
     }
 
-    private void updateUser(String username, String phone, String turn, String grade, String group) {
+    private void updateTeacher(String teachername, String phone, String turn, String grade, String group) {
         String id = mAuthProvider.getUid();
         Teacher teacher = new Teacher();
         teacher.setId(id);
         teacher.setIdKinder(mIdKinder);
-        teacher.setTeachername(username);
+        teacher.setTeachername(teachername);
         teacher.setPhone(phone);
         teacher.setTurn(turn);
         teacher.setGrade(grade);
@@ -206,7 +207,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
             if (task1.isSuccessful()) {
                 startActivity(new Intent(CompleteProfileActivity.this, HomeActivity.class));
                 finish();
-                Toast.makeText(this, "Bienvenido(a) " + username, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Bienvenido(a) " + teachername, Toast.LENGTH_SHORT).show();
             } else {
                 Snackbar.make(coordinatorLayout, "Error al registrar el docente en la base de datos", Snackbar.LENGTH_SHORT).show();
             }

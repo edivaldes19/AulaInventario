@@ -148,7 +148,7 @@
                     android:id="@+id/textInputPriceA"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:digits="0123456789"
+                    android:digits="0123456789."
                     android:inputType="phone"
                     android:maxLength="10"
                     android:textColor="@color/black"
@@ -176,7 +176,7 @@
                     android:id="@+id/textInputTotalA"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:digits="0123456789"
+                    android:digits="0123456789."
                     android:inputType="phone"
                     android:maxLength="10"
                     android:textColor="@color/black"
@@ -215,45 +215,46 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="15dp"
-                android:layout_marginEnd="30dp">
+                android:layout_marginEnd="30dp"
+                android:layout_marginBottom="15dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnClearA"
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabClearA"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="30dp"
-                    android:backgroundTint="@color/colorPrimary"
-                    android:text="@string/clear"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    app:backgroundTintMode="screen"
-                    app:cornerRadius="100dp"
-                    app:icon="@drawable/ic_clear"
-                    app:iconTint="@color/white"
+                    android:src="@drawable/ic_clear"
+                    android:tooltipText="Limpiar formulario"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/btnAddA"
+                    app:layout_constraintEnd_toStartOf="@id/spacerA"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription"
+                    tools:targetApi="o" />
+
+                <androidx.legacy.widget.Space
+                    android:id="@+id/spacerA"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/fabAddA"
+                    app:layout_constraintStart_toEndOf="@id/fabClearA"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAddA"
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabAddA"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="30dp"
-                    android:backgroundTint="@color/colorPrimary"
-                    android:text="@string/add"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    app:backgroundTintMode="screen"
-                    app:cornerRadius="100dp"
-                    app:icon="@drawable/ic_check"
-                    app:iconTint="@color/white"
+                    android:src="@drawable/ic_check"
+                    android:tooltipText="Agregar registro"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/btnClearA"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintStart_toEndOf="@id/spacerA"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription"
+                    tools:targetApi="o" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.text.TextUtils;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -45,7 +46,6 @@ public class ContactMeActivity extends AppCompatActivity {
     RadioGroup radioGroup;
     MaterialRadioButton materialRadioButton, materialRadioButtonComplain, materialRadioButtonSuggestion;
     final String emailProject = "appsmanuel1219@gmail.com", passwordProject = "e12171922M/";
-    String name, email, message;
     Session session;
     TeachersProvider mTeachersProvider;
     AuthProvider mAuthProvider;
@@ -73,15 +73,15 @@ public class ContactMeActivity extends AppCompatActivity {
         buttonSend.setOnClickListener(view -> {
             int radioID = radioGroup.getCheckedRadioButtonId();
             materialRadioButton = findViewById(radioID);
-            name = Objects.requireNonNull(textInputUsernameForm.getText()).toString().trim();
-            email = Objects.requireNonNull(textInputEmailForm.getText()).toString().trim();
-            message = Objects.requireNonNull(textInputMessageForm.getText()).toString().trim();
-            if (name.isEmpty() && !isEmailValid(email) && message.isEmpty() && (!materialRadioButtonComplain.isChecked() || !materialRadioButtonSuggestion.isChecked())) {
+            String name = Objects.requireNonNull(textInputUsernameForm.getText()).toString().trim();
+            String email = Objects.requireNonNull(textInputEmailForm.getText()).toString().trim();
+            String messageInput = Objects.requireNonNull(textInputMessageForm.getText()).toString().trim();
+            if (TextUtils.isEmpty(name) && !isEmailValid(email) && TextUtils.isEmpty(messageInput) && (!materialRadioButtonComplain.isChecked() || !materialRadioButtonSuggestion.isChecked())) {
                 Snackbar.make(view, "Complete los campos", Snackbar.LENGTH_SHORT).show();
             } else {
-                if (!name.isEmpty()) {
+                if (!TextUtils.isEmpty(name)) {
                     if (isEmailValid(email)) {
-                        if (!message.isEmpty()) {
+                        if (!TextUtils.isEmpty(messageInput)) {
                             if (materialRadioButtonComplain.isChecked() || materialRadioButtonSuggestion.isChecked()) {
                                 reason = materialRadioButton.getText().toString().trim();
                                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -103,7 +103,7 @@ public class ContactMeActivity extends AppCompatActivity {
                                     message.setFrom(new InternetAddress(email, name + " (" + email + ")"));
                                     message.setSubject(reason + " de Aula Inventario");
                                     message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailProject));
-                                    message.setContent(this.message, "text/html; charset=utf-8");
+                                    message.setContent(messageInput, "text/html; charset=utf-8");
                                     new SendMail().execute(message);
                                 } catch (Exception e) {
                                     Snackbar.make(view, "Error al enviar correo electrónico", Snackbar.LENGTH_SHORT).show();

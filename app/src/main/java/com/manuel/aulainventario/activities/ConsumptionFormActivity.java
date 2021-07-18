@@ -3,12 +3,13 @@ package com.manuel.aulainventario.activities;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.manuel.aulainventario.R;
@@ -24,7 +25,7 @@ import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouTyp
 public class ConsumptionFormActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
     TextInputEditText mEditTextNumberC, mEditTextDescriptionC, mEditTextAmountC;
-    MaterialButton mButtonClearC, mButtonAddC;
+    FloatingActionButton mFabClearC, mFabAddC;
     AuthProvider mAuthProvider;
     ConsumptionProvider mConsumptionProvider;
     ProgressDialog mProgressDialog;
@@ -38,13 +39,13 @@ public class ConsumptionFormActivity extends AppCompatActivity {
         mEditTextNumberC = findViewById(R.id.textInputNumberC);
         mEditTextDescriptionC = findViewById(R.id.textInputDescriptionC);
         mEditTextAmountC = findViewById(R.id.textInputAmountC);
-        mButtonClearC = findViewById(R.id.btnClearC);
-        mButtonAddC = findViewById(R.id.btnAddC);
+        mFabClearC = findViewById(R.id.fabClearC);
+        mFabAddC = findViewById(R.id.fabAddC);
         mAuthProvider = new AuthProvider();
         mConsumptionProvider = new ConsumptionProvider();
         mExtraIdConsumptionUpdate = getIntent().getStringExtra("idConsumptionUpdate");
         mExtraConsumptionTitle = getIntent().getStringExtra("consumptionTitle");
-        if (mExtraConsumptionTitle != null && !mExtraConsumptionTitle.isEmpty()) {
+        if (!TextUtils.isEmpty(mExtraConsumptionTitle)) {
             setTitle("Editar registro " + mExtraConsumptionTitle);
         } else {
             setTitle("Nuevo material de consumo");
@@ -58,16 +59,16 @@ public class ConsumptionFormActivity extends AppCompatActivity {
         validateFieldsAsYouType(mEditTextDescriptionC, "La descripción es obligatoria");
         validateFieldsAsYouType(mEditTextAmountC, "La cantidad es obligatoria");
         getDataFromAdapter();
-        mButtonClearC.setOnClickListener(v -> cleanForm());
-        mButtonAddC.setOnClickListener(v -> {
+        mFabClearC.setOnClickListener(v -> cleanForm());
+        mFabAddC.setOnClickListener(v -> {
             if (getIntent().getBooleanExtra("consumptionSelect", false)) {
                 //EDITAR REGISTRO
                 String number = Objects.requireNonNull(mEditTextNumberC.getText()).toString().trim();
                 String description = Objects.requireNonNull(mEditTextDescriptionC.getText()).toString().trim();
                 String amount = Objects.requireNonNull(mEditTextAmountC.getText()).toString().trim();
-                if (!number.isEmpty()) {
-                    if (!description.isEmpty()) {
-                        if (!amount.isEmpty()) {
+                if (!TextUtils.isEmpty(number)) {
+                    if (!TextUtils.isEmpty(description)) {
+                        if (!TextUtils.isEmpty(amount)) {
                             Consumption consumption = new Consumption();
                             consumption.setId(mExtraIdConsumptionUpdate);
                             consumption.setNumber(Long.parseLong(number));
@@ -89,9 +90,9 @@ public class ConsumptionFormActivity extends AppCompatActivity {
                 String number = Objects.requireNonNull(mEditTextNumberC.getText()).toString().trim();
                 String description = Objects.requireNonNull(mEditTextDescriptionC.getText()).toString().trim();
                 String amount = Objects.requireNonNull(mEditTextAmountC.getText()).toString().trim();
-                if (!number.isEmpty()) {
-                    if (!description.isEmpty()) {
-                        if (!amount.isEmpty()) {
+                if (!TextUtils.isEmpty(number)) {
+                    if (!TextUtils.isEmpty(description)) {
+                        if (!TextUtils.isEmpty(amount)) {
                             Consumption consumption = new Consumption();
                             consumption.setNumber(Long.parseLong(number));
                             consumption.setDescription(description);
@@ -116,8 +117,7 @@ public class ConsumptionFormActivity extends AppCompatActivity {
     private void getDataFromAdapter() {
         if (getIntent().getBooleanExtra("consumptionSelect", false)) {
             getConsumption();
-            mButtonAddC.setIconResource(R.drawable.ic_edit);
-            mButtonAddC.setText("Editar");
+            mFabAddC.setImageResource(R.drawable.ic_edit);
         }
     }
 

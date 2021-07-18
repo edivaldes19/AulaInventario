@@ -90,7 +90,7 @@
                 app:startIconDrawable="@drawable/ic_account_circle">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/textInputUsernameEdit"
+                    android:id="@+id/textInputTeachernameEdit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="ABCDEFGHIJKLMNÑOPQRSTUVWXYZÁÉÍÓÚabcdefghijklmnñopqrstuvwxyzáéíóú "
@@ -184,8 +184,9 @@
                 android:layout_marginEnd="30dp" />
 
             <HorizontalScrollView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="30dp">
@@ -193,7 +194,6 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="horizontal">
 

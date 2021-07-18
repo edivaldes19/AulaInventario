@@ -3,13 +3,14 @@ package com.manuel.aulainventario.activities;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
+import static com.manuel.aulainventario.utils.Validations.getLastPositionOfASpinner;
 import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
 
 public class PedagogicalFormActivity extends AppCompatActivity {
@@ -30,7 +32,7 @@ public class PedagogicalFormActivity extends AppCompatActivity {
     TextInputEditText mEditTextNumberP, mEditTextDescriptionP, mEditTextAmountP;
     MaterialTextView mTextViewConditionSelectedP;
     Spinner mSpinnerP;
-    MaterialButton mButtonClearP, mButtonAddP;
+    FloatingActionButton mFabClearP, mFabAddP;
     AuthProvider mAuthProvider;
     CollectionsProvider mCollectionsProvider;
     PedagogicalProvider mPedagogicalProvider;
@@ -48,15 +50,15 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         mEditTextAmountP = findViewById(R.id.textInputAmountP);
         mTextViewConditionSelectedP = findViewById(R.id.textViewConditionSelectedP);
         mSpinnerP = findViewById(R.id.spinnerConditionP);
-        mButtonClearP = findViewById(R.id.btnClearP);
-        mButtonAddP = findViewById(R.id.btnAddP);
+        mFabClearP = findViewById(R.id.fabClearP);
+        mFabAddP = findViewById(R.id.fabAddP);
         mAuthProvider = new AuthProvider();
         mCollectionsProvider = new CollectionsProvider(this, "Conditions");
         mPedagogicalProvider = new PedagogicalProvider();
         mConditionsList = new ArrayList<>();
         mExtraIdPedagogicalUpdate = getIntent().getStringExtra("idPedagogicalUpdate");
         mExtraPedagogicalTitle = getIntent().getStringExtra("pedagogicalTitle");
-        if (mExtraPedagogicalTitle != null && !mExtraPedagogicalTitle.isEmpty()) {
+        if (!TextUtils.isEmpty(mExtraPedagogicalTitle)) {
             setTitle("Editar registro " + mExtraPedagogicalTitle);
         } else {
             setTitle("Nuevo técnico pedagógico");
@@ -71,18 +73,18 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         validateFieldsAsYouType(mEditTextAmountP, "La cantidad es obligatoria");
         mCollectionsProvider.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mConditionsList, "condition", mSpinnerP, "Estado: ", mTextViewConditionSelectedP, "Error al obtener los estados");
         getDataFromAdapter();
-        mButtonClearP.setOnClickListener(v -> cleanForm());
-        mButtonAddP.setOnClickListener(v -> {
+        mFabClearP.setOnClickListener(v -> cleanForm());
+        mFabAddP.setOnClickListener(v -> {
             if (getIntent().getBooleanExtra("pedagogicalSelect", false)) {
                 //EDITAR REGISTRO
                 String number = Objects.requireNonNull(mEditTextNumberP.getText()).toString().trim();
                 String description = Objects.requireNonNull(mEditTextDescriptionP.getText()).toString().trim();
                 String amount = Objects.requireNonNull(mEditTextAmountP.getText()).toString().trim();
                 String condition = mSpinnerP.getSelectedItem().toString().trim();
-                if (!number.isEmpty()) {
-                    if (!description.isEmpty()) {
-                        if (!amount.isEmpty()) {
-                            if (!condition.isEmpty()) {
+                if (!TextUtils.isEmpty(number)) {
+                    if (!TextUtils.isEmpty(description)) {
+                        if (!TextUtils.isEmpty(amount)) {
+                            if (!TextUtils.isEmpty(condition)) {
                                 Pedagogical pedagogical = new Pedagogical();
                                 pedagogical.setId(mExtraIdPedagogicalUpdate);
                                 pedagogical.setNumber(Long.parseLong(number));
@@ -109,10 +111,10 @@ public class PedagogicalFormActivity extends AppCompatActivity {
                 String description = Objects.requireNonNull(mEditTextDescriptionP.getText()).toString().trim();
                 String amount = Objects.requireNonNull(mEditTextAmountP.getText()).toString().trim();
                 String condition = mSpinnerP.getSelectedItem().toString().trim();
-                if (!number.isEmpty()) {
-                    if (!description.isEmpty()) {
-                        if (!amount.isEmpty()) {
-                            if (!condition.isEmpty()) {
+                if (!TextUtils.isEmpty(number)) {
+                    if (!TextUtils.isEmpty(description)) {
+                        if (!TextUtils.isEmpty(amount)) {
+                            if (!TextUtils.isEmpty(condition)) {
                                 Pedagogical pedagogical = new Pedagogical();
                                 pedagogical.setNumber(Long.parseLong(number));
                                 pedagogical.setDescription(description);
@@ -141,8 +143,7 @@ public class PedagogicalFormActivity extends AppCompatActivity {
     private void getDataFromAdapter() {
         if (getIntent().getBooleanExtra("pedagogicalSelect", false)) {
             getPedagogical();
-            mButtonAddP.setIconResource(R.drawable.ic_edit);
-            mButtonAddP.setText("Editar");
+            mFabAddP.setImageResource(R.drawable.ic_edit);
         }
     }
 
@@ -163,13 +164,7 @@ public class PedagogicalFormActivity extends AppCompatActivity {
                 }
                 if (documentSnapshot.contains("condition")) {
                     String condition = documentSnapshot.getString("condition");
-                    mTextViewConditionSelectedP.setText(condition);
-                    for (int i = 0; i < mSpinnerP.getCount(); i++) {
-                        if (mSpinnerP.getItemAtPosition(i).toString().equalsIgnoreCase(condition)) {
-                            mSpinnerP.setSelection(i);
-                            break;
-                        }
-                    }
+                    mSpinnerP.setSelection(getLastPositionOfASpinner(mSpinnerP, condition));
                 }
             }
         });
@@ -210,8 +205,6 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         mEditTextNumberP.setText(null);
         mEditTextDescriptionP.setText(null);
         mEditTextAmountP.setText(null);
-        mTextViewConditionSelectedP.setText("Estado: ");
-        mSpinnerP.setSelection(0);
     }
 
     @Override

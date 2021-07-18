@@ -14,6 +14,10 @@
         android:title="@string/seeMyInformation"
         app:showAsAction="never" />
     <item
+        android:id="@+id/itemMap"
+        android:title="@string/seeMap"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/itemLogout"
         android:title="@string/signOut"
         app:showAsAction="never" />

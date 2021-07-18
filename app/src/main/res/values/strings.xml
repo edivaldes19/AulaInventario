@@ -56,4 +56,7 @@
     <string name="editInfo">Editar información</string>
     <string name="editMyInformation">Editar mi información</string>
     <string name="EditMe">Editar información</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="seeMap">Ver mapa</string>
+    <string name="satelliteView">Vista de satélite</string>
 </resources>

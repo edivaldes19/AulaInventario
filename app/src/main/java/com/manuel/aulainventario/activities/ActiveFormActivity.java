@@ -3,13 +3,14 @@ package com.manuel.aulainventario.activities;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
@@ -23,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
+import static com.manuel.aulainventario.utils.Validations.calculateTotal;
+import static com.manuel.aulainventario.utils.Validations.getLastPositionOfASpinner;
 import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
 
 public class ActiveFormActivity extends AppCompatActivity {
@@ -30,7 +33,7 @@ public class ActiveFormActivity extends AppCompatActivity {
     TextInputEditText mEditTextNumberA, mEditTextKeyA, mEditTextDescriptionA, mEditTextAmountA, mEditTextPriceA, mEditTextTotalA;
     MaterialTextView mTextViewConditionSelectedA;
     Spinner mSpinnerA;
-    MaterialButton mButtonClearA, mButtonAddA;
+    FloatingActionButton mFabClearA, mFabAddA;
     AuthProvider mAuthProvider;
     CollectionsProvider mCollectionsProvider;
     ActiveProvider mActiveProvider;
@@ -51,15 +54,15 @@ public class ActiveFormActivity extends AppCompatActivity {
         mEditTextTotalA = findViewById(R.id.textInputTotalA);
         mTextViewConditionSelectedA = findViewById(R.id.textViewConditionSelectedA);
         mSpinnerA = findViewById(R.id.spinnerConditionA);
-        mButtonClearA = findViewById(R.id.btnClearA);
-        mButtonAddA = findViewById(R.id.btnAddA);
+        mFabClearA = findViewById(R.id.fabClearA);
+        mFabAddA = findViewById(R.id.fabAddA);
         mAuthProvider = new AuthProvider();
         mCollectionsProvider = new CollectionsProvider(this, "Conditions");
         mActiveProvider = new ActiveProvider();
         mConditionsList = new ArrayList<>();
         mExtraIdActiveUpdate = getIntent().getStringExtra("idActiveUpdate");
         mExtraActiveTitle = getIntent().getStringExtra("activeTitle");
-        if (mExtraActiveTitle != null && !mExtraActiveTitle.isEmpty()) {
+        if (!TextUtils.isEmpty(mExtraActiveTitle)) {
             setTitle("Editar registro " + mExtraActiveTitle);
         } else {
             setTitle("Nuevo activo fijo");
@@ -75,10 +78,12 @@ public class ActiveFormActivity extends AppCompatActivity {
         validateFieldsAsYouType(mEditTextAmountA, "La cantidad es obligatoria");
         validateFieldsAsYouType(mEditTextPriceA, "El precio es obligatorio");
         validateFieldsAsYouType(mEditTextTotalA, "El total es obligatorio");
+        calculateTotal(mEditTextAmountA, mEditTextPriceA, mEditTextTotalA);
+        calculateTotal(mEditTextPriceA, mEditTextAmountA, mEditTextTotalA);
         mCollectionsProvider.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mConditionsList, "condition", mSpinnerA, "Estado: ", mTextViewConditionSelectedA, "Error al obtener los estados");
         getDataFromAdapter();
-        mButtonClearA.setOnClickListener(v -> cleanForm());
-        mButtonAddA.setOnClickListener(v -> {
+        mFabClearA.setOnClickListener(v -> cleanForm());
+        mFabAddA.setOnClickListener(v -> {
             if (getIntent().getBooleanExtra("activeSelect", false)) {
                 //EDITAR REGISTRO
                 String number = Objects.requireNonNull(mEditTextNumberA.getText()).toString().trim();
@@ -88,21 +93,21 @@ public class ActiveFormActivity extends AppCompatActivity {
                 String price = Objects.requireNonNull(mEditTextPriceA.getText()).toString().trim();
                 String total = Objects.requireNonNull(mEditTextTotalA.getText()).toString().trim();
                 String condition = mSpinnerA.getSelectedItem().toString().trim();
-                if (!number.isEmpty()) {
-                    if (!key.isEmpty()) {
-                        if (!description.isEmpty()) {
-                            if (!amount.isEmpty()) {
-                                if (!price.isEmpty()) {
-                                    if (!total.isEmpty()) {
-                                        if (!condition.isEmpty()) {
+                if (!TextUtils.isEmpty(number)) {
+                    if (!TextUtils.isEmpty(key)) {
+                        if (!TextUtils.isEmpty(description)) {
+                            if (!TextUtils.isEmpty(amount)) {
+                                if (!TextUtils.isEmpty(price)) {
+                                    if (!TextUtils.isEmpty(total)) {
+                                        if (!TextUtils.isEmpty(condition)) {
                                             Active active = new Active();
                                             active.setId(mExtraIdActiveUpdate);
                                             active.setNumber(Long.parseLong(number));
                                             active.setKey(key);
                                             active.setDescription(description);
                                             active.setAmount(Long.parseLong(amount));
-                                            active.setPrice(Long.parseLong(price));
-                                            active.setTotal(Long.parseLong(total));
+                                            active.setPrice(Double.parseDouble(price));
+                                            active.setTotal(Double.parseDouble(total));
                                             active.setCondition(condition);
                                             active.setTimestamp(new Date().getTime());
                                             updateInfo(active);
@@ -136,20 +141,20 @@ public class ActiveFormActivity extends AppCompatActivity {
                 String price = Objects.requireNonNull(mEditTextPriceA.getText()).toString().trim();
                 String total = Objects.requireNonNull(mEditTextTotalA.getText()).toString().trim();
                 String condition = mSpinnerA.getSelectedItem().toString().trim();
-                if (!number.isEmpty()) {
-                    if (!key.isEmpty()) {
-                        if (!description.isEmpty()) {
-                            if (!amount.isEmpty()) {
-                                if (!price.isEmpty()) {
-                                    if (!total.isEmpty()) {
-                                        if (!condition.isEmpty()) {
+                if (!TextUtils.isEmpty(number)) {
+                    if (!TextUtils.isEmpty(key)) {
+                        if (!TextUtils.isEmpty(description)) {
+                            if (!TextUtils.isEmpty(amount)) {
+                                if (!TextUtils.isEmpty(price)) {
+                                    if (!TextUtils.isEmpty(total)) {
+                                        if (!TextUtils.isEmpty(condition)) {
                                             Active active = new Active();
                                             active.setNumber(Long.parseLong(number));
                                             active.setKey(key);
                                             active.setDescription(description);
                                             active.setAmount(Long.parseLong(amount));
-                                            active.setPrice(Long.parseLong(price));
-                                            active.setTotal(Long.parseLong(total));
+                                            active.setPrice(Double.parseDouble(price));
+                                            active.setTotal(Double.parseDouble(total));
                                             active.setCondition(condition);
                                             active.setIdTeacher(mAuthProvider.getUid());
                                             active.setTimestamp(new Date().getTime());
@@ -183,8 +188,7 @@ public class ActiveFormActivity extends AppCompatActivity {
     private void getDataFromAdapter() {
         if (getIntent().getBooleanExtra("activeSelect", false)) {
             getActive();
-            mButtonAddA.setIconResource(R.drawable.ic_edit);
-            mButtonAddA.setText("Editar");
+            mFabAddA.setImageResource(R.drawable.ic_edit);
         }
     }
 
@@ -208,22 +212,16 @@ public class ActiveFormActivity extends AppCompatActivity {
                     mEditTextAmountA.setText(String.valueOf(amount));
                 }
                 if (documentSnapshot.contains("price")) {
-                    long price = documentSnapshot.getLong("price");
+                    double price = documentSnapshot.getDouble("price");
                     mEditTextPriceA.setText(String.valueOf(price));
                 }
                 if (documentSnapshot.contains("total")) {
-                    long total = documentSnapshot.getLong("total");
+                    double total = documentSnapshot.getDouble("total");
                     mEditTextTotalA.setText(String.valueOf(total));
                 }
                 if (documentSnapshot.contains("condition")) {
                     String condition = documentSnapshot.getString("condition");
-                    mTextViewConditionSelectedA.setText(condition);
-                    for (int i = 0; i < mSpinnerA.getCount(); i++) {
-                        if (mSpinnerA.getItemAtPosition(i).toString().equalsIgnoreCase(condition)) {
-                            mSpinnerA.setSelection(i);
-                            break;
-                        }
-                    }
+                    mSpinnerA.setSelection(getLastPositionOfASpinner(mSpinnerA, condition));
                 }
             }
         });
@@ -267,8 +265,6 @@ public class ActiveFormActivity extends AppCompatActivity {
         mEditTextAmountA.setText(null);
         mEditTextPriceA.setText(null);
         mEditTextTotalA.setText(null);
-        mTextViewConditionSelectedA.setText("Estado: ");
-        mSpinnerA.setSelection(0);
     }
 
     @Override
