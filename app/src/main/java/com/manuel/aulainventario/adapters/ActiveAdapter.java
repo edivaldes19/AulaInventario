@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,6 +38,7 @@ public class ActiveAdapter extends FirestoreRecyclerAdapter<Active, ActiveAdapte
 
     @Override
     protected void onBindViewHolder(@NonNull ActiveAdapter.ViewHolder holder, int position, @NonNull Active active) {
+        holder.cardViewActive.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_transition));
         DocumentSnapshot snapshot = getSnapshots().getSnapshot(position);
         String activeId = snapshot.getId();
         holder.materialTextViewNumber.setText(String.valueOf(active.getNumber()));

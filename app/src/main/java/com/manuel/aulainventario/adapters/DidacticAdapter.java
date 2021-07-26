@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,6 +38,7 @@ public class DidacticAdapter extends FirestoreRecyclerAdapter<Didactic, Didactic
 
     @Override
     protected void onBindViewHolder(@NonNull DidacticAdapter.ViewHolder holder, int position, @NonNull Didactic didactic) {
+        holder.cardViewDidactic.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_transition));
         DocumentSnapshot snapshot = getSnapshots().getSnapshot(position);
         String didacticId = snapshot.getId();
         holder.materialTextViewNumber.setText(String.valueOf(didactic.getNumber()));

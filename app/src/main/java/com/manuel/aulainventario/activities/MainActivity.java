@@ -39,9 +39,9 @@ import com.manuel.aulainventario.providers.TeachersProvider;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.manuel.aulainventario.utils.Validations.isEmailValid;
-import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
-import static com.manuel.aulainventario.utils.Validations.validatePasswordFieldsAsYouType;
+import static com.manuel.aulainventario.utils.MyTools.isEmailValid;
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
+import static com.manuel.aulainventario.utils.MyTools.validatePasswordFieldsAsYouType;
 
 public class MainActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
@@ -82,34 +82,7 @@ public class MainActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         validateFieldsAsYouType(mTextInputEmail, "El correo electrónico es obligatorio");
         validatePasswordFieldsAsYouType(mTextInputPassword, "La contraseña es obligatoria");
-        materialButtonLogin.setOnClickListener(v -> {
-            String email = Objects.requireNonNull(mTextInputEmail.getText()).toString().trim();
-            String password = Objects.requireNonNull(mTextInputPassword.getText()).toString().trim();
-            if (!TextUtils.isEmpty(email)) {
-                if (!TextUtils.isEmpty(password)) {
-                    if (isEmailValid(email)) {
-                        progressDialog.show();
-                        mAuthProvider.login(email, password).addOnCompleteListener(task -> {
-                            progressDialog.dismiss();
-                            if (task.isSuccessful()) {
-                                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                Snackbar.make(v, "El correo electrónico y/o contraseña son incorrectos", Snackbar.LENGTH_SHORT).show();
-                            }
-                        });
-                    } else {
-                        Snackbar.make(v, "Formato de correo electrónico inválido", Snackbar.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Snackbar.make(v, "La contraseña es obligatoria", Snackbar.LENGTH_SHORT).show();
-                }
-            } else {
-                Snackbar.make(v, "El correo electrónico es obligatorio", Snackbar.LENGTH_SHORT).show();
-            }
-        });
+        materialButtonLogin.setOnClickListener(v -> normalLogin());
         mButtonGoogle.setOnClickListener(v -> resultLauncher.launch(new Intent(mGoogleSignInClient.getSignInIntent())));
         materialTextView_register.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, RegisterActivity.class)));
         materialTextViewForgotPassword.setOnClickListener(v -> showDialogForgotPassword());
@@ -123,6 +96,35 @@ public class MainActivity extends AppCompatActivity {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
+    }
+
+    private void normalLogin() {
+        String email = Objects.requireNonNull(mTextInputEmail.getText()).toString().trim();
+        String password = Objects.requireNonNull(mTextInputPassword.getText()).toString().trim();
+        if (!TextUtils.isEmpty(email)) {
+            if (!TextUtils.isEmpty(password)) {
+                if (isEmailValid(email)) {
+                    progressDialog.show();
+                    mAuthProvider.login(email, password).addOnCompleteListener(task -> {
+                        progressDialog.dismiss();
+                        if (task.isSuccessful()) {
+                            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Snackbar.make(coordinatorLayout, "El correo electrónico y/o contraseña son incorrectos", Snackbar.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Snackbar.make(coordinatorLayout, "Formato de correo electrónico inválido", Snackbar.LENGTH_SHORT).show();
+                }
+            } else {
+                Snackbar.make(coordinatorLayout, "La contraseña es obligatoria", Snackbar.LENGTH_SHORT).show();
+            }
+        } else {
+            Snackbar.make(coordinatorLayout, "El correo electrónico es obligatorio", Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     private void showDialogForgotPassword() {

@@ -90,4 +90,13 @@ public class Teacher {
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
+
+    @Override
+    public String toString() {
+        return "Teacher{" +
+                "turn='" + turn + '\'' +
+                ", grade='" + grade + '\'' +
+                ", group='" + group + '\'' +
+                '}';
+    }
 }

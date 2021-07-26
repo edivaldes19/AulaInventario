@@ -1,12 +1,12 @@
 package com.manuel.aulainventario.fragments;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,14 +51,23 @@ public class ActiveFragment extends Fragment implements MaterialSearchBar.OnSear
         mActiveProvider = new ActiveProvider();
         mSearchBar.setOnSearchActionListener(this);
         mFab.setOnClickListener(v -> goToForm());
-        showTooltip();
-        return mView;
-    }
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
 
-    private void showTooltip() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mFab.setTooltipText("Crear un nuevo registro");
-        }
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy < 0) {
+                    mFab.show();
+                } else if (dy > 0) {
+                    mFab.hide();
+                }
+            }
+        });
+        return mView;
     }
 
     private void searchByDescription(String description) {

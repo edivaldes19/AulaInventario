@@ -5,14 +5,21 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.widget.Spinner;
 
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.manuel.aulainventario.models.Teacher;
+import com.manuel.aulainventario.providers.TeachersProvider;
 
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Validations {
+public class MyTools {
     public static boolean isEmailValid(String email) {
         String expression = "^[\\w.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
         Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
@@ -89,10 +96,29 @@ public class Validations {
     public static int getLastPositionOfASpinner(Spinner spinner, String s) {
         int position = 0;
         for (int i = 0; i < spinner.getCount(); i++) {
-            if ((spinner.getItemAtPosition(i).toString()).equals(s)) {
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(s)) {
                 position = i;
             }
         }
         return position;
+    }
+
+    public static void compareTeachersInformation(TeachersProvider teachersProvider, CoordinatorLayout coordinatorLayout, List<Teacher> teacherList) {
+        teachersProvider.getAllTeacherDocuments().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
+                    if (snapshot.exists()) {
+                        if (snapshot.contains("grade") && snapshot.contains("group") && snapshot.contains("turn")) {
+                            String allGrades = snapshot.getString("grade");
+                            String allGroups = snapshot.getString("group");
+                            String allShifts = snapshot.getString("turn");
+                            teacherList.add(new Teacher(null, null, null, null, null, allShifts, allGrades, allGroups, 0));
+                        }
+                    }
+                }
+            } else {
+                Snackbar.make(coordinatorLayout, "Error al obtener la información de los docentes", Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 }

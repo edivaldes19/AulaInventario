@@ -33,9 +33,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static com.manuel.aulainventario.utils.Validations.isEmailValid;
-import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
-import static com.manuel.aulainventario.utils.Validations.validatePasswordFieldsAsYouType;
+import static com.manuel.aulainventario.utils.MyTools.compareTeachersInformation;
+import static com.manuel.aulainventario.utils.MyTools.isEmailValid;
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
+import static com.manuel.aulainventario.utils.MyTools.validatePasswordFieldsAsYouType;
 
 public class RegisterActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
@@ -50,6 +51,7 @@ public class RegisterActivity extends AppCompatActivity {
     CollectionsProvider mCollectionsProviderShifts, mCollectionsProviderGrades, mCollectionsProviderGroups;
     ProgressDialog mDialog;
     ArrayList<String> mTeachernameList, mPhoneList, mShiftsList, mGradesList, mGroupsList;
+    List<Teacher> mTeacherList;
     String mIdKinder;
 
     @Override
@@ -83,11 +85,15 @@ public class RegisterActivity extends AppCompatActivity {
         mShiftsList = new ArrayList<>();
         mGradesList = new ArrayList<>();
         mGroupsList = new ArrayList<>();
+        mTeacherList = new ArrayList<>();
         mDialog = new ProgressDialog(this);
         mDialog.setTitle("Registrando...");
         mDialog.setMessage("Por favor, espere un momento");
         mDialog.setCancelable(false);
         mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mCollectionsProviderShifts.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mShiftsList, "turn", mSpinnerTurn, "Turno: ", mTextViewTurnSelected, "Error al obtener los turnos");
+        mCollectionsProviderGrades.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGradesList, "grade", mSpinnerGrade, "Grado: ", mTextViewGradeSelected, "Error al obtener los grados");
+        mCollectionsProviderGroups.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGroupsList, "group", mSpinnerGroup, "Grupo: ", mTextViewGroupSelected, "Error al obtener los grupos");
         validateFieldsAsYouType(mTextInputTeachername, "El nombre y apellido es obligatorio");
         validateFieldsAsYouType(mTextInputEmailR, "El correo electrónico es obligatorio");
         validateFieldsAsYouType(mTextInputPhone, "El número de teléfono es obligatorio");
@@ -95,87 +101,95 @@ public class RegisterActivity extends AppCompatActivity {
         validatePasswordFieldsAsYouType(mTextInputConfirmPasswordR, "Debe confirmar su contraseña");
         isTeacherInfoExist(mTeachernameList, "teachername");
         isTeacherInfoExist(mPhoneList, "phone");
-        mCollectionsProviderShifts.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mShiftsList, "turn", mSpinnerTurn, "Turno: ", mTextViewTurnSelected, "Error al obtener los turnos");
-        mCollectionsProviderGrades.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGradesList, "grade", mSpinnerGrade, "Grado: ", mTextViewGradeSelected, "Error al obtener los grados");
-        mCollectionsProviderGroups.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGroupsList, "group", mSpinnerGroup, "Grupo: ", mTextViewGroupSelected, "Error al obtener los grupos");
         getAllKindergartens();
-        materialButtonRegister.setOnClickListener(v -> {
-            String teachername = Objects.requireNonNull(mTextInputTeachername.getText()).toString().trim();
-            String email = Objects.requireNonNull(mTextInputEmailR.getText()).toString().trim();
-            String phone = Objects.requireNonNull(mTextInputPhone.getText()).toString().trim();
-            String kinder = mSpinnerKinder.getSelectedItem().toString().trim();
-            String turn = mSpinnerTurn.getSelectedItem().toString().trim();
-            String grade = mSpinnerGrade.getSelectedItem().toString().trim();
-            String group = mSpinnerGroup.getSelectedItem().toString().trim();
-            String password = Objects.requireNonNull(mTextInputPasswordR.getText()).toString().trim();
-            String confirmPassword = Objects.requireNonNull(mTextInputConfirmPasswordR.getText()).toString().trim();
-            if (!TextUtils.isEmpty(teachername)) {
-                if (!TextUtils.isEmpty(email)) {
-                    if (!TextUtils.isEmpty(phone)) {
-                        if (!TextUtils.isEmpty(kinder)) {
-                            if (!TextUtils.isEmpty(turn)) {
-                                if (!TextUtils.isEmpty(grade)) {
-                                    if (!TextUtils.isEmpty(group)) {
-                                        if (!TextUtils.isEmpty(password)) {
-                                            if (!TextUtils.isEmpty(confirmPassword)) {
-                                                if (mTeachernameList != null && !mTeachernameList.isEmpty()) {
-                                                    for (String s : mTeachernameList) {
-                                                        if (s.equals(teachername)) {
-                                                            Snackbar.make(v, "Ya existe un docente con ese nombre", Snackbar.LENGTH_SHORT).show();
-                                                            return;
-                                                        }
+        mImageViewBack.setOnClickListener(v -> finish());
+        materialButtonRegister.setOnClickListener(v -> normalRegister());
+    }
+
+    private void normalRegister() {
+        String teachername = Objects.requireNonNull(mTextInputTeachername.getText()).toString().trim();
+        String email = Objects.requireNonNull(mTextInputEmailR.getText()).toString().trim();
+        String phone = Objects.requireNonNull(mTextInputPhone.getText()).toString().trim();
+        String kinder = mSpinnerKinder.getSelectedItem().toString().trim();
+        String turn = mSpinnerTurn.getSelectedItem().toString().trim();
+        String grade = mSpinnerGrade.getSelectedItem().toString().trim();
+        String group = mSpinnerGroup.getSelectedItem().toString().trim();
+        String password = Objects.requireNonNull(mTextInputPasswordR.getText()).toString().trim();
+        String confirmPassword = Objects.requireNonNull(mTextInputConfirmPasswordR.getText()).toString().trim();
+        if (!TextUtils.isEmpty(teachername)) {
+            if (!TextUtils.isEmpty(email)) {
+                if (!TextUtils.isEmpty(phone)) {
+                    if (!TextUtils.isEmpty(kinder)) {
+                        if (!TextUtils.isEmpty(turn)) {
+                            if (!TextUtils.isEmpty(grade)) {
+                                if (!TextUtils.isEmpty(group)) {
+                                    if (!TextUtils.isEmpty(password)) {
+                                        if (!TextUtils.isEmpty(confirmPassword)) {
+                                            if (mTeachernameList != null && !mTeachernameList.isEmpty()) {
+                                                for (String s : mTeachernameList) {
+                                                    if (s.equals(teachername)) {
+                                                        Snackbar.make(coordinatorLayout, "Ya existe un docente con ese nombre", Snackbar.LENGTH_SHORT).show();
+                                                        return;
                                                     }
                                                 }
-                                                if (mPhoneList != null && !mPhoneList.isEmpty()) {
-                                                    for (String s : mPhoneList) {
-                                                        if (s.equals(phone)) {
-                                                            Snackbar.make(v, "Ya existe un docente con ese teléfono", Snackbar.LENGTH_SHORT).show();
-                                                            return;
-                                                        }
+                                            }
+                                            if (mPhoneList != null && !mPhoneList.isEmpty()) {
+                                                for (String s : mPhoneList) {
+                                                    if (s.equals(phone)) {
+                                                        Snackbar.make(coordinatorLayout, "Ya existe un docente con ese teléfono", Snackbar.LENGTH_SHORT).show();
+                                                        return;
                                                     }
                                                 }
-                                                if (isEmailValid(email)) {
-                                                    if (password.equals(confirmPassword)) {
-                                                        if (password.length() >= 6) {
-                                                            createTeacher(email, teachername, phone, turn, grade, group, password);
-                                                        } else {
-                                                            Snackbar.make(v, "La contraseña debe ser mayor o igual a 6 caracteres", Snackbar.LENGTH_SHORT).show();
-                                                        }
+                                            }
+                                            compareTeachersInformation(mTeachersProvider, coordinatorLayout, mTeacherList);
+                                            if (mTeacherList != null && !mTeacherList.isEmpty()) {
+                                                for (int i = 0; i < mTeacherList.size(); i++) {
+                                                    if ((mTeacherList.get(i).getGrade().equals(grade)) && (mTeacherList.get(i).getGroup().equals(group)) && (mTeacherList.get(i).getTurn().equals(turn))) {
+                                                        Snackbar.make(coordinatorLayout, "Ya existe un docente ocupando ese grupo", Snackbar.LENGTH_SHORT).show();
+                                                        return;
+                                                    }
+                                                }
+                                            }
+                                            if (isEmailValid(email)) {
+                                                if (password.equals(confirmPassword)) {
+                                                    if (password.length() >= 6) {
+                                                        createTeacher(email, teachername, phone, turn, grade, group, password);
                                                     } else {
-                                                        Snackbar.make(v, "Las contraseñas no coinciden", Snackbar.LENGTH_SHORT).show();
+                                                        Snackbar.make(coordinatorLayout, "La contraseña debe ser mayor o igual a 6 caracteres", Snackbar.LENGTH_SHORT).show();
                                                     }
                                                 } else {
-                                                    Snackbar.make(v, "Formato de correo electrónico inválido", Snackbar.LENGTH_SHORT).show();
+                                                    Snackbar.make(coordinatorLayout, "Las contraseñas no coinciden", Snackbar.LENGTH_SHORT).show();
                                                 }
                                             } else {
-                                                Snackbar.make(v, "Debe confirmar su contraseña", Snackbar.LENGTH_SHORT).show();
+                                                Snackbar.make(coordinatorLayout, "Formato de correo electrónico inválido", Snackbar.LENGTH_SHORT).show();
                                             }
                                         } else {
-                                            Snackbar.make(v, "La contraseña es obligatoria", Snackbar.LENGTH_SHORT).show();
+                                            Snackbar.make(coordinatorLayout, "Debe confirmar su contraseña", Snackbar.LENGTH_SHORT).show();
                                         }
                                     } else {
-                                        Snackbar.make(v, "Debe seleccionar un grupo", Snackbar.LENGTH_SHORT).show();
+                                        Snackbar.make(coordinatorLayout, "La contraseña es obligatoria", Snackbar.LENGTH_SHORT).show();
                                     }
                                 } else {
-                                    Snackbar.make(v, "Debe seleccionar un grado", Snackbar.LENGTH_SHORT).show();
+                                    Snackbar.make(coordinatorLayout, "Debe seleccionar un grupo", Snackbar.LENGTH_SHORT).show();
                                 }
                             } else {
-                                Snackbar.make(v, "Debe seleccionar un turno", Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(coordinatorLayout, "Debe seleccionar un grado", Snackbar.LENGTH_SHORT).show();
                             }
                         } else {
-                            Snackbar.make(v, "Debe seleccionar un jardín de niños", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(coordinatorLayout, "Debe seleccionar un turno", Snackbar.LENGTH_SHORT).show();
                         }
                     } else {
-                        Snackbar.make(v, "El número de teléfono es obligatorio", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(coordinatorLayout, "Debe seleccionar un jardín de niños", Snackbar.LENGTH_SHORT).show();
                     }
                 } else {
-                    Snackbar.make(v, "El correo electrónico es obligatorio", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(coordinatorLayout, "El número de teléfono es obligatorio", Snackbar.LENGTH_SHORT).show();
                 }
             } else {
-                Snackbar.make(v, "El nombre y apellido es obligatorio", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(coordinatorLayout, "El correo electrónico es obligatorio", Snackbar.LENGTH_SHORT).show();
             }
-        });
-        mImageViewBack.setOnClickListener(v -> finish());
+        } else {
+            Snackbar.make(coordinatorLayout, "El nombre y apellido es obligatorio", Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     private void isTeacherInfoExist(ArrayList<String> stringList, String field) {
@@ -251,11 +265,11 @@ public class RegisterActivity extends AppCompatActivity {
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();
+                        Toast.makeText(RegisterActivity.this, "Bienvenido(a) " + teachername, Toast.LENGTH_LONG).show();
                     } else {
                         Snackbar.make(coordinatorLayout, "Error al registrar el docente en la base de datos", Snackbar.LENGTH_SHORT).show();
                     }
                 });
-                Toast.makeText(RegisterActivity.this, "Bienvenido(a) " + teachername, Toast.LENGTH_LONG).show();
             } else {
                 mDialog.dismiss();
                 Snackbar.make(coordinatorLayout, "Ya existe un docente con ese correo electrónico", Snackbar.LENGTH_SHORT).show();

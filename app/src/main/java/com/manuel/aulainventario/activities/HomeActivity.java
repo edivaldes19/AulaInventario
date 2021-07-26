@@ -75,10 +75,10 @@ public class HomeActivity extends AppCompatActivity implements ConnectionReceive
         ConnectivityManager manager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
         boolean isConnected = networkInfo != null && networkInfo.isConnectedOrConnecting();
-        showSnackBar(isConnected);
+        showToast(isConnected);
     }
 
-    private void showSnackBar(boolean isConnected) {
+    private void showToast(boolean isConnected) {
         if (!isConnected) {
             Toast.makeText(getApplicationContext(), "Error de red, verifique su conexión", Toast.LENGTH_LONG).show();
             finishAffinity();
@@ -123,7 +123,7 @@ public class HomeActivity extends AppCompatActivity implements ConnectionReceive
 
     @Override
     public void onNetworkChange(boolean isConnected) {
-        showSnackBar(isConnected);
+        showToast(isConnected);
     }
 
     @Override
@@ -142,7 +142,6 @@ public class HomeActivity extends AppCompatActivity implements ConnectionReceive
     public void onBackPressed() {
         if (isPressed) {
             finishAffinity();
-            System.exit(0);
         } else {
             Toast.makeText(getApplicationContext(), "Presione de nuevo para salir", Toast.LENGTH_SHORT).show();
             isPressed = true;

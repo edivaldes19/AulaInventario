@@ -1,6 +1,7 @@
 package com.manuel.aulainventario.activities;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -21,6 +22,7 @@ public class MyProfileActivity extends AppCompatActivity {
     AuthProvider mAuthProvider;
     TeachersProvider mTeachersProvider;
     KinderProvider mKinderProvider;
+    ProgressDialog mProgressDialogGetting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,11 @@ public class MyProfileActivity extends AppCompatActivity {
         mTeachersProvider = new TeachersProvider();
         mAuthProvider = new AuthProvider();
         mKinderProvider = new KinderProvider();
+        mProgressDialogGetting = new ProgressDialog(this);
+        mProgressDialogGetting.setTitle("Obteniendo datos...");
+        mProgressDialogGetting.setMessage("Por favor, espere un momento");
+        mProgressDialogGetting.setCancelable(false);
+        mProgressDialogGetting.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mButtonEditInfo.setOnClickListener(v -> {
             startActivity(new Intent(this, EditInfoActivity.class));
             finish();
@@ -49,6 +56,7 @@ public class MyProfileActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void getTeacher() {
+        mProgressDialogGetting.show();
         mTeachersProvider.getTeacher(mAuthProvider.getUid()).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("idKinder")) {
@@ -102,6 +110,7 @@ public class MyProfileActivity extends AppCompatActivity {
                     mTextViewLastUpdate.setText(time);
                 }
             }
+            mProgressDialogGetting.dismiss();
         });
     }
 }

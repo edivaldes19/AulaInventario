@@ -2,6 +2,7 @@ package com.manuel.aulainventario.activities;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -32,8 +33,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static com.manuel.aulainventario.utils.Validations.getLastPositionOfASpinner;
-import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
+import static com.manuel.aulainventario.utils.MyTools.compareTeachersInformation;
+import static com.manuel.aulainventario.utils.MyTools.getLastPositionOfASpinner;
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
 
 public class EditInfoActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
@@ -46,8 +48,9 @@ public class EditInfoActivity extends AppCompatActivity {
     TeachersProvider mTeachersProvider;
     KinderProvider mKinderProvider;
     CollectionsProvider mCollectionsProviderKindergartens, mCollectionsProviderShifts, mCollectionsProviderGrades, mCollectionsProviderGroups;
-    ProgressDialog mDialog;
+    ProgressDialog mDialog, mProgressDialogGetting;
     ArrayList<String> mTeachernameList, mPhoneList, mShiftsList, mGradesList, mGroupsList;
+    List<Teacher> mTeacherList;
     String mIdKinder;
 
     @Override
@@ -79,86 +82,96 @@ public class EditInfoActivity extends AppCompatActivity {
         mShiftsList = new ArrayList<>();
         mGradesList = new ArrayList<>();
         mGroupsList = new ArrayList<>();
+        mTeacherList = new ArrayList<>();
         mDialog = new ProgressDialog(this);
-        mDialog.setTitle("Registrando...");
+        mDialog.setTitle("Editando información...");
         mDialog.setMessage("Por favor, espere un momento");
         mDialog.setCancelable(false);
         mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialogGetting = new ProgressDialog(this);
+        mProgressDialogGetting.setTitle("Obteniendo datos...");
+        mProgressDialogGetting.setMessage("Por favor, espere un momento");
+        mProgressDialogGetting.setCancelable(false);
+        mProgressDialogGetting.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mCollectionsProviderShifts.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mShiftsList, "turn", mSpinnerTurn, "Turno: ", mTextViewTurnSelected, "Error al obtener los turnos");
+        mCollectionsProviderGrades.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGradesList, "grade", mSpinnerGrade, "Grado: ", mTextViewGradeSelected, "Error al obtener los grados");
+        mCollectionsProviderGroups.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGroupsList, "group", mSpinnerGroup, "Grupo: ", mTextViewGroupSelected, "Error al obtener los grupos");
         validateFieldsAsYouType(mTextInputTeachername, "El nombre y apellido es obligatorio");
         validateFieldsAsYouType(mTextInputPhone, "El número de teléfono es obligatorio");
         isUserInfoExist(mTeachernameList, "teachername");
         isUserInfoExist(mPhoneList, "phone");
-        mCollectionsProviderShifts.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mShiftsList, "turn", mSpinnerTurn, "Turno: ", mTextViewTurnSelected, "Error al obtener los turnos");
-        mCollectionsProviderGrades.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGradesList, "grade", mSpinnerGrade, "Grado: ", mTextViewGradeSelected, "Error al obtener los grados");
-        mCollectionsProviderGroups.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGroupsList, "group", mSpinnerGroup, "Grupo: ", mTextViewGroupSelected, "Error al obtener los grupos");
         getAllKindergartens();
-        mButtonEdit.setOnClickListener(v -> {
-            String teachername = Objects.requireNonNull(mTextInputTeachername.getText()).toString().trim();
-            String phone = Objects.requireNonNull(mTextInputPhone.getText()).toString().trim();
-            String kinder = mSpinnerKinder.getSelectedItem().toString().trim();
-            String turn = mSpinnerTurn.getSelectedItem().toString().trim();
-            String grade = mSpinnerGrade.getSelectedItem().toString().trim();
-            String group = mSpinnerGroup.getSelectedItem().toString().trim();
-            if (!TextUtils.isEmpty(teachername)) {
-                if (!TextUtils.isEmpty(phone)) {
-                    if (!TextUtils.isEmpty(kinder)) {
-                        if (!TextUtils.isEmpty(turn)) {
-                            if (!TextUtils.isEmpty(grade)) {
-                                if (!TextUtils.isEmpty(group)) {
-                                    if (mTeachernameList != null && !mTeachernameList.isEmpty()) {
-                                        for (int i = 0; i < mTeachernameList.size(); i++) {
-                                            if (mTeachernameList.get(i).equals(teachername)) {
-                                                mTeachernameList.remove(i);
-                                                break;
-                                            }
-                                        }
-                                        for (String s : mTeachernameList) {
-                                            if (s.equals(teachername)) {
-                                                Snackbar.make(v, "Ya existe un docente con ese nombre", Snackbar.LENGTH_SHORT).show();
-                                                return;
-                                            }
-                                        }
-                                    }
-                                    if (mPhoneList != null && !mPhoneList.isEmpty()) {
-                                        for (int i = 0; i < mPhoneList.size(); i++) {
-                                            if (mPhoneList.get(i).equals(phone)) {
-                                                mPhoneList.remove(i);
-                                                break;
-                                            }
-                                        }
-                                        for (String s : mPhoneList) {
-                                            if (s.equals(phone)) {
-                                                Snackbar.make(v, "Ya existe un docente con ese teléfono", Snackbar.LENGTH_SHORT).show();
-                                                return;
-                                            }
-                                        }
-                                    }
-                                    updateUser(teachername, phone, turn, grade, group);
-                                } else {
-                                    Snackbar.make(v, "Debe seleccionar un grupo", Snackbar.LENGTH_SHORT).show();
-                                }
-                            } else {
-                                Snackbar.make(v, "Debe seleccionar un grado", Snackbar.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Snackbar.make(v, "Debe seleccionar un turno", Snackbar.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Snackbar.make(v, "Debe seleccionar un jardín de niños", Snackbar.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Snackbar.make(v, "El número de teléfono es obligatorio", Snackbar.LENGTH_SHORT).show();
-                }
-            } else {
-                Snackbar.make(v, "El nombre y apellido es obligatorio", Snackbar.LENGTH_SHORT).show();
-            }
-        });
         mImageViewBack.setOnClickListener(v -> finish());
+        mButtonEdit.setOnClickListener(v -> editInfo());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         getTeacher();
     }
 
-    @SuppressLint("SetTextI18n")
+    private void editInfo() {
+        String teachername = Objects.requireNonNull(mTextInputTeachername.getText()).toString().trim();
+        String phone = Objects.requireNonNull(mTextInputPhone.getText()).toString().trim();
+        String kinder = mSpinnerKinder.getSelectedItem().toString().trim();
+        String turn = mSpinnerTurn.getSelectedItem().toString().trim();
+        String grade = mSpinnerGrade.getSelectedItem().toString().trim();
+        String group = mSpinnerGroup.getSelectedItem().toString().trim();
+        if (!TextUtils.isEmpty(teachername)) {
+            if (!TextUtils.isEmpty(phone)) {
+                if (!TextUtils.isEmpty(kinder)) {
+                    if (!TextUtils.isEmpty(turn)) {
+                        if (!TextUtils.isEmpty(grade)) {
+                            if (!TextUtils.isEmpty(group)) {
+                                if (mTeachernameList != null && !mTeachernameList.isEmpty()) {
+                                    for (String s : mTeachernameList) {
+                                        if (s.equals(teachername)) {
+                                            Snackbar.make(coordinatorLayout, "Ya existe un docente con ese nombre", Snackbar.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                    }
+                                }
+                                if (mPhoneList != null && !mPhoneList.isEmpty()) {
+                                    for (String s : mPhoneList) {
+                                        if (s.equals(phone)) {
+                                            Snackbar.make(coordinatorLayout, "Ya existe un docente con ese teléfono", Snackbar.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                    }
+                                }
+                                compareTeachersInformation(mTeachersProvider, coordinatorLayout, mTeacherList);
+                                if (mTeacherList != null && !mTeacherList.isEmpty()) {
+                                    for (int i = 0; i < mTeacherList.size(); i++) {
+                                        if ((mTeacherList.get(i).getGrade().equals(grade)) && (mTeacherList.get(i).getGroup().equals(group)) && (mTeacherList.get(i).getTurn().equals(turn))) {
+                                            Snackbar.make(coordinatorLayout, "Ya existe un docente ocupando ese grupo", Snackbar.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                    }
+                                }
+                                updateUser(teachername, phone, turn, grade, group);
+                            } else {
+                                Snackbar.make(coordinatorLayout, "Debe seleccionar un grupo", Snackbar.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Snackbar.make(coordinatorLayout, "Debe seleccionar un grado", Snackbar.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Snackbar.make(coordinatorLayout, "Debe seleccionar un turno", Snackbar.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Snackbar.make(coordinatorLayout, "Debe seleccionar un jardín de niños", Snackbar.LENGTH_SHORT).show();
+                }
+            } else {
+                Snackbar.make(coordinatorLayout, "El número de teléfono es obligatorio", Snackbar.LENGTH_SHORT).show();
+            }
+        } else {
+            Snackbar.make(coordinatorLayout, "El nombre y apellido es obligatorio", Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
     private void getTeacher() {
+        mProgressDialogGetting.show();
         mTeachersProvider.getTeacher(mAuthProvider.getUid()).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("idKinder")) {
@@ -178,24 +191,65 @@ public class EditInfoActivity extends AppCompatActivity {
                 if (documentSnapshot.contains("teachername")) {
                     String teachername = documentSnapshot.getString("teachername");
                     mTextInputTeachername.setText(teachername);
+                    if (mTeachernameList != null && !mTeachernameList.isEmpty()) {
+                        for (int i = 0; i < mTeachernameList.size(); i++) {
+                            if (mTeachernameList.get(i).equals(teachername)) {
+                                mTeachernameList.remove(i);
+                                break;
+                            }
+                        }
+                    }
                 }
                 if (documentSnapshot.contains("phone")) {
                     String phone = documentSnapshot.getString("phone");
                     mTextInputPhone.setText(phone);
+                    if (mPhoneList != null && !mPhoneList.isEmpty()) {
+                        for (int i = 0; i < mPhoneList.size(); i++) {
+                            if (mPhoneList.get(i).equals(phone)) {
+                                mPhoneList.remove(i);
+                                break;
+                            }
+                        }
+                    }
                 }
                 if (documentSnapshot.contains("turn")) {
                     String turn = documentSnapshot.getString("turn");
                     mSpinnerTurn.setSelection(getLastPositionOfASpinner(mSpinnerTurn, turn));
+                    if (mShiftsList != null && !mShiftsList.isEmpty()) {
+                        for (int i = 0; i < mShiftsList.size(); i++) {
+                            if (mShiftsList.get(i).equals(turn)) {
+                                mShiftsList.remove(i);
+                                break;
+                            }
+                        }
+                    }
                 }
                 if (documentSnapshot.contains("grade")) {
                     String grade = documentSnapshot.getString("grade");
                     mSpinnerGrade.setSelection(getLastPositionOfASpinner(mSpinnerGrade, grade));
+                    if (mGradesList != null && !mGradesList.isEmpty()) {
+                        for (int i = 0; i < mGradesList.size(); i++) {
+                            if (mGradesList.get(i).equals(grade)) {
+                                mGradesList.remove(i);
+                                break;
+                            }
+                        }
+                    }
                 }
                 if (documentSnapshot.contains("group")) {
                     String group = documentSnapshot.getString("group");
                     mSpinnerGroup.setSelection(getLastPositionOfASpinner(mSpinnerGroup, group));
+                    if (mGroupsList != null && !mGroupsList.isEmpty()) {
+                        for (int i = 0; i < mGroupsList.size(); i++) {
+                            if (mGroupsList.get(i).equals(group)) {
+                                mGroupsList.remove(i);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
+            mProgressDialogGetting.dismiss();
         });
     }
 
@@ -265,6 +319,7 @@ public class EditInfoActivity extends AppCompatActivity {
         mTeachersProvider.update(teacher).addOnCompleteListener(task1 -> {
             mDialog.dismiss();
             if (task1.isSuccessful()) {
+                startActivity(new Intent(this, MyProfileActivity.class));
                 finish();
                 Toast.makeText(this, "Información actualizada", Toast.LENGTH_SHORT).show();
             } else {

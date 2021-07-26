@@ -34,8 +34,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import static com.manuel.aulainventario.utils.Validations.isEmailValid;
-import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
+import static com.manuel.aulainventario.utils.MyTools.isEmailValid;
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
 
 public class ContactMeActivity extends AppCompatActivity {
     public static String reason;

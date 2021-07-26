@@ -9,12 +9,14 @@ import android.widget.Spinner;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -57,6 +59,23 @@ public class CollectionsProvider {
                 });
             } else {
                 Snackbar.make(coordinatorLayout, error, Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public Task<QuerySnapshot> getNumbersByTeacher(String idTeacher, CoordinatorLayout coordinatorLayout, ArrayList<Long> longs) {
+        return mCollection.whereEqualTo("idTeacher", idTeacher).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
+                    if (snapshot.exists()) {
+                        if (snapshot.contains("number")) {
+                            long allFields = snapshot.getLong("number");
+                            longs.add(allFields);
+                        }
+                    }
+                }
+            } else {
+                Snackbar.make(coordinatorLayout, "Error al obtener los números", Snackbar.LENGTH_SHORT).show();
             }
         });
     }

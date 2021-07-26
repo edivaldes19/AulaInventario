@@ -1,12 +1,13 @@
 package com.manuel.aulainventario.activities;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
@@ -24,8 +25,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.manuel.aulainventario.utils.Validations.getLastPositionOfASpinner;
-import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
+import static com.manuel.aulainventario.utils.MyTools.getLastPositionOfASpinner;
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
 
 public class PedagogicalFormActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
@@ -34,11 +35,12 @@ public class PedagogicalFormActivity extends AppCompatActivity {
     Spinner mSpinnerP;
     FloatingActionButton mFabClearP, mFabAddP;
     AuthProvider mAuthProvider;
-    CollectionsProvider mCollectionsProvider;
+    CollectionsProvider mCollectionsProvider, mCollectionsProviderForNumbers;
     PedagogicalProvider mPedagogicalProvider;
-    ProgressDialog mProgressDialog;
+    ProgressDialog mProgressDialog, mProgressDialogGetting;
     String mExtraIdPedagogicalUpdate, mExtraPedagogicalTitle;
     ArrayList<String> mConditionsList;
+    ArrayList<Long> mNumbersList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +56,10 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         mFabAddP = findViewById(R.id.fabAddP);
         mAuthProvider = new AuthProvider();
         mCollectionsProvider = new CollectionsProvider(this, "Conditions");
+        mCollectionsProviderForNumbers = new CollectionsProvider(this, "Pedagogical");
         mPedagogicalProvider = new PedagogicalProvider();
         mConditionsList = new ArrayList<>();
+        mNumbersList = new ArrayList<>();
         mExtraIdPedagogicalUpdate = getIntent().getStringExtra("idPedagogicalUpdate");
         mExtraPedagogicalTitle = getIntent().getStringExtra("pedagogicalTitle");
         if (!TextUtils.isEmpty(mExtraPedagogicalTitle)) {
@@ -68,112 +72,162 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Por favor, espere un momento");
         mProgressDialog.setCancelable(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialogGetting = new ProgressDialog(this);
+        mProgressDialogGetting.setTitle("Obteniendo datos...");
+        mProgressDialogGetting.setMessage("Por favor, espere un momento");
+        mProgressDialogGetting.setCancelable(false);
+        mProgressDialogGetting.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mCollectionsProvider.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mConditionsList, "condition", mSpinnerP, "Estado: ", mTextViewConditionSelectedP, "Error al obtener los estados");
+        mCollectionsProviderForNumbers.getNumbersByTeacher(mAuthProvider.getUid(), coordinatorLayout, mNumbersList);
         validateFieldsAsYouType(mEditTextNumberP, "El número es obligatorio");
         validateFieldsAsYouType(mEditTextDescriptionP, "La descripción es obligatoria");
         validateFieldsAsYouType(mEditTextAmountP, "La cantidad es obligatoria");
-        mCollectionsProvider.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mConditionsList, "condition", mSpinnerP, "Estado: ", mTextViewConditionSelectedP, "Error al obtener los estados");
-        getDataFromAdapter();
         mFabClearP.setOnClickListener(v -> cleanForm());
-        mFabAddP.setOnClickListener(v -> {
-            if (getIntent().getBooleanExtra("pedagogicalSelect", false)) {
-                //EDITAR REGISTRO
-                String number = Objects.requireNonNull(mEditTextNumberP.getText()).toString().trim();
-                String description = Objects.requireNonNull(mEditTextDescriptionP.getText()).toString().trim();
-                String amount = Objects.requireNonNull(mEditTextAmountP.getText()).toString().trim();
-                String condition = mSpinnerP.getSelectedItem().toString().trim();
-                if (!TextUtils.isEmpty(number)) {
-                    if (!TextUtils.isEmpty(description)) {
-                        if (!TextUtils.isEmpty(amount)) {
-                            if (!TextUtils.isEmpty(condition)) {
-                                Pedagogical pedagogical = new Pedagogical();
-                                pedagogical.setId(mExtraIdPedagogicalUpdate);
-                                pedagogical.setNumber(Long.parseLong(number));
-                                pedagogical.setDescription(description);
-                                pedagogical.setAmount(Long.parseLong(amount));
-                                pedagogical.setCondition(condition);
-                                pedagogical.setTimestamp(new Date().getTime());
-                                updateInfo(pedagogical);
-                            } else {
-                                Snackbar.make(v, "El estado es obligatorio", Snackbar.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Snackbar.make(v, "La cantidad es obligatoria", Snackbar.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Snackbar.make(v, "La descripción es obligatoria", Snackbar.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Snackbar.make(v, "El número es obligatorio", Snackbar.LENGTH_SHORT).show();
-                }
-            } else {
-                //CREAR REGISTRO
-                String number = Objects.requireNonNull(mEditTextNumberP.getText()).toString().trim();
-                String description = Objects.requireNonNull(mEditTextDescriptionP.getText()).toString().trim();
-                String amount = Objects.requireNonNull(mEditTextAmountP.getText()).toString().trim();
-                String condition = mSpinnerP.getSelectedItem().toString().trim();
-                if (!TextUtils.isEmpty(number)) {
-                    if (!TextUtils.isEmpty(description)) {
-                        if (!TextUtils.isEmpty(amount)) {
-                            if (!TextUtils.isEmpty(condition)) {
-                                Pedagogical pedagogical = new Pedagogical();
-                                pedagogical.setNumber(Long.parseLong(number));
-                                pedagogical.setDescription(description);
-                                pedagogical.setAmount(Long.parseLong(amount));
-                                pedagogical.setCondition(condition);
-                                pedagogical.setIdTeacher(mAuthProvider.getUid());
-                                pedagogical.setTimestamp(new Date().getTime());
-                                saveInfo(pedagogical);
-                            } else {
-                                Snackbar.make(v, "El estado es obligatorio", Snackbar.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Snackbar.make(v, "La cantidad es obligatoria", Snackbar.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Snackbar.make(v, "La descripción es obligatoria", Snackbar.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Snackbar.make(v, "El número es obligatorio", Snackbar.LENGTH_SHORT).show();
-                }
-            }
-        });
+        mFabAddP.setOnClickListener(v -> addOrEditPedagogicalTechnician());
     }
 
-    @SuppressLint("SetTextI18n")
-    private void getDataFromAdapter() {
+    @Override
+    protected void onStart() {
+        super.onStart();
         if (getIntent().getBooleanExtra("pedagogicalSelect", false)) {
             getPedagogical();
             mFabAddP.setImageResource(R.drawable.ic_edit);
         }
     }
 
+    private void addOrEditPedagogicalTechnician() {
+        if (getIntent().getBooleanExtra("pedagogicalSelect", false)) {
+            String numberField = Objects.requireNonNull(mEditTextNumberP.getText()).toString().trim();
+            String description = Objects.requireNonNull(mEditTextDescriptionP.getText()).toString().trim();
+            String amountField = Objects.requireNonNull(mEditTextAmountP.getText()).toString().trim();
+            String condition = mSpinnerP.getSelectedItem().toString().trim();
+            if (!TextUtils.isEmpty(numberField)) {
+                long number = Long.parseLong(numberField);
+                if (number != 0) {
+                    if (!TextUtils.isEmpty(description)) {
+                        if (!TextUtils.isEmpty(amountField)) {
+                            long amount = Long.parseLong(amountField);
+                            if (amount != 0) {
+                                if (!TextUtils.isEmpty(condition)) {
+                                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
+                                        for (Long aLong : mNumbersList) {
+                                            if (aLong == number) {
+                                                Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
+                                                return;
+                                            }
+                                        }
+                                    }
+                                    Pedagogical pedagogical = new Pedagogical();
+                                    pedagogical.setId(mExtraIdPedagogicalUpdate);
+                                    pedagogical.setNumber(number);
+                                    pedagogical.setDescription(description);
+                                    pedagogical.setAmount(amount);
+                                    pedagogical.setCondition(condition);
+                                    pedagogical.setTimestamp(new Date().getTime());
+                                    updateInfo(pedagogical);
+                                } else {
+                                    Snackbar.make(coordinatorLayout, "El estado es obligatorio", Snackbar.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Snackbar.make(coordinatorLayout, "La cantidad no puede ser 0", Snackbar.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Snackbar.make(coordinatorLayout, "La cantidad es obligatoria", Snackbar.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Snackbar.make(coordinatorLayout, "La descripción es obligatoria", Snackbar.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Snackbar.make(coordinatorLayout, "El número no puede ser 0", Snackbar.LENGTH_SHORT).show();
+                }
+            } else {
+                Snackbar.make(coordinatorLayout, "El número es obligatorio", Snackbar.LENGTH_SHORT).show();
+            }
+        } else {
+            String numberField = Objects.requireNonNull(mEditTextNumberP.getText()).toString().trim();
+            String description = Objects.requireNonNull(mEditTextDescriptionP.getText()).toString().trim();
+            String amountField = Objects.requireNonNull(mEditTextAmountP.getText()).toString().trim();
+            String condition = mSpinnerP.getSelectedItem().toString().trim();
+            if (!TextUtils.isEmpty(numberField)) {
+                long number = Long.parseLong(numberField);
+                if (number != 0) {
+                    if (!TextUtils.isEmpty(description)) {
+                        if (!TextUtils.isEmpty(amountField)) {
+                            long amount = Long.parseLong(amountField);
+                            if (amount != 0) {
+                                if (!TextUtils.isEmpty(condition)) {
+                                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
+                                        for (Long aLong : mNumbersList) {
+                                            if (aLong == number) {
+                                                Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
+                                                return;
+                                            }
+                                        }
+                                    }
+                                    Pedagogical pedagogical = new Pedagogical();
+                                    pedagogical.setNumber(number);
+                                    pedagogical.setDescription(description);
+                                    pedagogical.setAmount(amount);
+                                    pedagogical.setCondition(condition);
+                                    pedagogical.setIdTeacher(mAuthProvider.getUid());
+                                    pedagogical.setTimestamp(new Date().getTime());
+                                    saveInfo(pedagogical);
+                                } else {
+                                    Snackbar.make(coordinatorLayout, "El estado es obligatorio", Snackbar.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Snackbar.make(coordinatorLayout, "La cantidad no puede ser 0", Snackbar.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Snackbar.make(coordinatorLayout, "La cantidad es obligatoria", Snackbar.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Snackbar.make(coordinatorLayout, "La descripción es obligatoria", Snackbar.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Snackbar.make(coordinatorLayout, "El número no puede ser 0", Snackbar.LENGTH_SHORT).show();
+                }
+            } else {
+                Snackbar.make(coordinatorLayout, "El número es obligatorio", Snackbar.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private void getPedagogical() {
+        mProgressDialogGetting.show();
         mPedagogicalProvider.getPedagogicalById(mExtraIdPedagogicalUpdate).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("number")) {
                     long number = documentSnapshot.getLong("number");
                     mEditTextNumberP.setText(String.valueOf(number));
+                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
+                        for (int i = 0; i < mNumbersList.size(); i++) {
+                            if (mNumbersList.get(i) == number) {
+                                mNumbersList.remove(i);
+                                break;
+                            }
+                        }
+                    }
+                    if (documentSnapshot.contains("description")) {
+                        String description = documentSnapshot.getString("description");
+                        mEditTextDescriptionP.setText(description);
+                    }
+                    if (documentSnapshot.contains("amount")) {
+                        long amount = documentSnapshot.getLong("amount");
+                        mEditTextAmountP.setText(String.valueOf(amount));
+                    }
+                    if (documentSnapshot.contains("condition")) {
+                        String condition = documentSnapshot.getString("condition");
+                        mSpinnerP.setSelection(getLastPositionOfASpinner(mSpinnerP, condition));
+                    }
                 }
-                if (documentSnapshot.contains("description")) {
-                    String description = documentSnapshot.getString("description");
-                    mEditTextDescriptionP.setText(description);
-                }
-                if (documentSnapshot.contains("amount")) {
-                    long amount = documentSnapshot.getLong("amount");
-                    mEditTextAmountP.setText(String.valueOf(amount));
-                }
-                if (documentSnapshot.contains("condition")) {
-                    String condition = documentSnapshot.getString("condition");
-                    mSpinnerP.setSelection(getLastPositionOfASpinner(mSpinnerP, condition));
-                }
+                mProgressDialogGetting.dismiss();
             }
         });
     }
 
     private void saveInfo(Pedagogical pedagogical) {
-        if (mProgressDialog.isShowing()) {
-            mProgressDialog.show();
-        }
+        mProgressDialog.show();
         mPedagogicalProvider.save(pedagogical).addOnCompleteListener(task -> {
             mProgressDialog.dismiss();
             if (task.isSuccessful()) {
@@ -186,9 +240,7 @@ public class PedagogicalFormActivity extends AppCompatActivity {
     }
 
     private void updateInfo(Pedagogical pedagogical) {
-        if (mProgressDialog.isShowing()) {
-            mProgressDialog.show();
-        }
+        mProgressDialog.show();
         mPedagogicalProvider.update(pedagogical).addOnCompleteListener(task -> {
             mProgressDialog.dismiss();
             if (task.isSuccessful()) {
@@ -200,16 +252,18 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         });
     }
 
-    @SuppressLint("SetTextI18n")
     private void cleanForm() {
         mEditTextNumberP.setText(null);
         mEditTextDescriptionP.setText(null);
         mEditTextAmountP.setText(null);
+        mSpinnerP.setSelection(0);
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return true;
     }
 }

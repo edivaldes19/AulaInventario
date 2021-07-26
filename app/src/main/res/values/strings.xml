@@ -59,4 +59,6 @@
     <string name="title_activity_maps">Map</string>
     <string name="seeMap">Ver mapa</string>
     <string name="satelliteView">Vista de satélite</string>
+    <string name="pushSearch">Oprime aquí para buscar…</string>
+    <string name="createNewRegister">Crear un nuevo registro</string>
 </resources>

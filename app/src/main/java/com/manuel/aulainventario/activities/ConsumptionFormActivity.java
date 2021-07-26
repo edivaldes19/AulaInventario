@@ -1,11 +1,12 @@
 package com.manuel.aulainventario.activities;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
@@ -15,12 +16,14 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.manuel.aulainventario.R;
 import com.manuel.aulainventario.models.Consumption;
 import com.manuel.aulainventario.providers.AuthProvider;
+import com.manuel.aulainventario.providers.CollectionsProvider;
 import com.manuel.aulainventario.providers.ConsumptionProvider;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.manuel.aulainventario.utils.Validations.validateFieldsAsYouType;
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
 
 public class ConsumptionFormActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
@@ -28,8 +31,10 @@ public class ConsumptionFormActivity extends AppCompatActivity {
     FloatingActionButton mFabClearC, mFabAddC;
     AuthProvider mAuthProvider;
     ConsumptionProvider mConsumptionProvider;
-    ProgressDialog mProgressDialog;
+    CollectionsProvider mCollectionsProviderForNumbers;
+    ProgressDialog mProgressDialog, mProgressDialogGetting;
     String mExtraIdConsumptionUpdate, mExtraConsumptionTitle;
+    ArrayList<Long> mNumbersList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,8 @@ public class ConsumptionFormActivity extends AppCompatActivity {
         mFabAddC = findViewById(R.id.fabAddC);
         mAuthProvider = new AuthProvider();
         mConsumptionProvider = new ConsumptionProvider();
+        mCollectionsProviderForNumbers = new CollectionsProvider(this, "Consumption");
+        mNumbersList = new ArrayList<>();
         mExtraIdConsumptionUpdate = getIntent().getStringExtra("idConsumptionUpdate");
         mExtraConsumptionTitle = getIntent().getStringExtra("consumptionTitle");
         if (!TextUtils.isEmpty(mExtraConsumptionTitle)) {
@@ -55,78 +62,129 @@ public class ConsumptionFormActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Por favor, espere un momento");
         mProgressDialog.setCancelable(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialogGetting = new ProgressDialog(this);
+        mProgressDialogGetting.setTitle("Obteniendo datos...");
+        mProgressDialogGetting.setMessage("Por favor, espere un momento");
+        mProgressDialogGetting.setCancelable(false);
+        mProgressDialogGetting.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mCollectionsProviderForNumbers.getNumbersByTeacher(mAuthProvider.getUid(), coordinatorLayout, mNumbersList);
         validateFieldsAsYouType(mEditTextNumberC, "El número es obligatorio");
         validateFieldsAsYouType(mEditTextDescriptionC, "La descripción es obligatoria");
         validateFieldsAsYouType(mEditTextAmountC, "La cantidad es obligatoria");
-        getDataFromAdapter();
         mFabClearC.setOnClickListener(v -> cleanForm());
-        mFabAddC.setOnClickListener(v -> {
-            if (getIntent().getBooleanExtra("consumptionSelect", false)) {
-                //EDITAR REGISTRO
-                String number = Objects.requireNonNull(mEditTextNumberC.getText()).toString().trim();
-                String description = Objects.requireNonNull(mEditTextDescriptionC.getText()).toString().trim();
-                String amount = Objects.requireNonNull(mEditTextAmountC.getText()).toString().trim();
-                if (!TextUtils.isEmpty(number)) {
-                    if (!TextUtils.isEmpty(description)) {
-                        if (!TextUtils.isEmpty(amount)) {
-                            Consumption consumption = new Consumption();
-                            consumption.setId(mExtraIdConsumptionUpdate);
-                            consumption.setNumber(Long.parseLong(number));
-                            consumption.setDescription(description);
-                            consumption.setAmount(Long.parseLong(amount));
-                            consumption.setTimestamp(new Date().getTime());
-                            updateInfo(consumption);
-                        } else {
-                            Snackbar.make(v, "La cantidad es obligatoria", Snackbar.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Snackbar.make(v, "La descripción es obligatoria", Snackbar.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Snackbar.make(v, "El número es obligatorio", Snackbar.LENGTH_SHORT).show();
-                }
-            } else {
-                //CREAR REGISTRO
-                String number = Objects.requireNonNull(mEditTextNumberC.getText()).toString().trim();
-                String description = Objects.requireNonNull(mEditTextDescriptionC.getText()).toString().trim();
-                String amount = Objects.requireNonNull(mEditTextAmountC.getText()).toString().trim();
-                if (!TextUtils.isEmpty(number)) {
-                    if (!TextUtils.isEmpty(description)) {
-                        if (!TextUtils.isEmpty(amount)) {
-                            Consumption consumption = new Consumption();
-                            consumption.setNumber(Long.parseLong(number));
-                            consumption.setDescription(description);
-                            consumption.setAmount(Long.parseLong(amount));
-                            consumption.setIdTeacher(mAuthProvider.getUid());
-                            consumption.setTimestamp(new Date().getTime());
-                            saveInfo(consumption);
-                        } else {
-                            Snackbar.make(v, "La cantidad es obligatoria", Snackbar.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Snackbar.make(v, "La descripción es obligatoria", Snackbar.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Snackbar.make(v, "El número es obligatorio", Snackbar.LENGTH_SHORT).show();
-                }
-            }
-        });
+        mFabAddC.setOnClickListener(v -> addOrEditConsumables());
     }
 
-    @SuppressLint("SetTextI18n")
-    private void getDataFromAdapter() {
+    @Override
+    protected void onStart() {
+        super.onStart();
         if (getIntent().getBooleanExtra("consumptionSelect", false)) {
             getConsumption();
             mFabAddC.setImageResource(R.drawable.ic_edit);
         }
     }
 
+    private void addOrEditConsumables() {
+        if (getIntent().getBooleanExtra("consumptionSelect", false)) {
+            String numberField = Objects.requireNonNull(mEditTextNumberC.getText()).toString().trim();
+            String description = Objects.requireNonNull(mEditTextDescriptionC.getText()).toString().trim();
+            String amountField = Objects.requireNonNull(mEditTextAmountC.getText()).toString().trim();
+            if (!TextUtils.isEmpty(numberField)) {
+                long number = Long.parseLong(numberField);
+                if (number != 0) {
+                    if (!TextUtils.isEmpty(description)) {
+                        if (!TextUtils.isEmpty(amountField)) {
+                            long amount = Long.parseLong(amountField);
+                            if (amount != 0) {
+                                if (mNumbersList != null && !mNumbersList.isEmpty()) {
+                                    for (Long aLong : mNumbersList) {
+                                        if (aLong == number) {
+                                            Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                    }
+                                }
+                                Consumption consumption = new Consumption();
+                                consumption.setId(mExtraIdConsumptionUpdate);
+                                consumption.setNumber(number);
+                                consumption.setDescription(description);
+                                consumption.setAmount(amount);
+                                consumption.setTimestamp(new Date().getTime());
+                                updateInfo(consumption);
+                            } else {
+                                Snackbar.make(coordinatorLayout, "La cantidad no puede ser 0", Snackbar.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Snackbar.make(coordinatorLayout, "La cantidad es obligatoria", Snackbar.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Snackbar.make(coordinatorLayout, "La descripción es obligatoria", Snackbar.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Snackbar.make(coordinatorLayout, "El número no puede ser 0", Snackbar.LENGTH_SHORT).show();
+                }
+            } else {
+                Snackbar.make(coordinatorLayout, "El número es obligatorio", Snackbar.LENGTH_SHORT).show();
+            }
+        } else {
+            String numberField = Objects.requireNonNull(mEditTextNumberC.getText()).toString().trim();
+            String description = Objects.requireNonNull(mEditTextDescriptionC.getText()).toString().trim();
+            String amountField = Objects.requireNonNull(mEditTextAmountC.getText()).toString().trim();
+            if (!TextUtils.isEmpty(numberField)) {
+                long number = Long.parseLong(numberField);
+                if (number != 0) {
+                    if (!TextUtils.isEmpty(description)) {
+                        if (!TextUtils.isEmpty(amountField)) {
+                            long amount = Long.parseLong(amountField);
+                            if (amount != 0) {
+                                if (mNumbersList != null && !mNumbersList.isEmpty()) {
+                                    for (Long aLong : mNumbersList) {
+                                        if (aLong == number) {
+                                            Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                    }
+                                }
+                                Consumption consumption = new Consumption();
+                                consumption.setNumber(number);
+                                consumption.setDescription(description);
+                                consumption.setAmount(amount);
+                                consumption.setIdTeacher(mAuthProvider.getUid());
+                                consumption.setTimestamp(new Date().getTime());
+                                saveInfo(consumption);
+                            } else {
+                                Snackbar.make(coordinatorLayout, "La cantidad no puede ser 0", Snackbar.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Snackbar.make(coordinatorLayout, "La cantidad es obligatoria", Snackbar.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Snackbar.make(coordinatorLayout, "La descripción es obligatoria", Snackbar.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Snackbar.make(coordinatorLayout, "El número no puede ser 0", Snackbar.LENGTH_SHORT).show();
+                }
+            } else {
+                Snackbar.make(coordinatorLayout, "El número es obligatorio", Snackbar.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private void getConsumption() {
+        mProgressDialogGetting.show();
         mConsumptionProvider.getConsumptionById(mExtraIdConsumptionUpdate).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("number")) {
                     long number = documentSnapshot.getLong("number");
                     mEditTextNumberC.setText(String.valueOf(number));
+                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
+                        for (int i = 0; i < mNumbersList.size(); i++) {
+                            if (mNumbersList.get(i) == number) {
+                                mNumbersList.remove(i);
+                                break;
+                            }
+                        }
+                    }
                 }
                 if (documentSnapshot.contains("description")) {
                     String description = documentSnapshot.getString("description");
@@ -137,13 +195,12 @@ public class ConsumptionFormActivity extends AppCompatActivity {
                     mEditTextAmountC.setText(String.valueOf(amount));
                 }
             }
+            mProgressDialogGetting.dismiss();
         });
     }
 
     private void saveInfo(Consumption consumption) {
-        if (mProgressDialog.isShowing()) {
-            mProgressDialog.show();
-        }
+        mProgressDialog.show();
         mConsumptionProvider.save(consumption).addOnCompleteListener(task -> {
             mProgressDialog.dismiss();
             if (task.isSuccessful()) {
@@ -156,9 +213,7 @@ public class ConsumptionFormActivity extends AppCompatActivity {
     }
 
     private void updateInfo(Consumption consumption) {
-        if (mProgressDialog.isShowing()) {
-            mProgressDialog.show();
-        }
+        mProgressDialog.show();
         mConsumptionProvider.update(consumption).addOnCompleteListener(task -> {
             mProgressDialog.dismiss();
             if (task.isSuccessful()) {
@@ -170,7 +225,6 @@ public class ConsumptionFormActivity extends AppCompatActivity {
         });
     }
 
-    @SuppressLint("SetTextI18n")
     private void cleanForm() {
         mEditTextNumberC.setText(null);
         mEditTextDescriptionC.setText(null);
@@ -178,8 +232,10 @@ public class ConsumptionFormActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return true;
     }
 }

@@ -62,7 +62,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             GeoPoint geoPoint = document.getGeoPoint("location");
                             if (geoPoint != null) {
                                 LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
-                                googleMap.addMarker(new MarkerOptions().position(latLng).title(name).snippet(gardenKey).alpha(0.5f));
+                                googleMap.addMarker(new MarkerOptions().position(latLng).title(name).snippet(gardenKey));
                             }
                         }
                     }
@@ -87,7 +87,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
                 finish();
             }).setNegativeButton("Cancelar", (dialog, which) -> {
-                startActivity(new Intent(MapsActivity.this, MainActivity.class));
+                startActivity(new Intent(MapsActivity.this, HomeActivity.class));
                 finish();
             }).show();
         }
