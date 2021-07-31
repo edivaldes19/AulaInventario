@@ -14,6 +14,7 @@ import com.manuel.aulainventario.models.Teacher;
 import com.manuel.aulainventario.providers.TeachersProvider;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -93,10 +94,91 @@ public class MyTools {
         });
     }
 
-    public static int getLastPositionOfASpinner(Spinner spinner, String s) {
+    public static void isTeacherInfoExist(CoordinatorLayout coordinatorLayout, TeachersProvider teachersProvider, ArrayList<String> stringList, String field) {
+        teachersProvider.getAllTeacherDocuments().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
+                    if (snapshot.exists()) {
+                        if (snapshot.contains(field)) {
+                            String allFields = snapshot.getString(field);
+                            stringList.add(allFields);
+                        }
+                    }
+                }
+            } else {
+                Snackbar.make(coordinatorLayout, "Error al obtener la información de los docentes", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static void setPositionByCondition(Spinner spinner, String condition) {
+        if (!TextUtils.isEmpty(condition)) {
+            switch (condition) {
+                case "Bueno":
+                    spinner.setSelection(0);
+                    break;
+                case "Malo":
+                    spinner.setSelection(1);
+                    break;
+                case "Regular":
+                    spinner.setSelection(2);
+                    break;
+            }
+        }
+    }
+
+    public static void setPositionByGrade(Spinner spinner, String grade) {
+        if (!TextUtils.isEmpty(grade)) {
+            switch (grade) {
+                case "1":
+                    spinner.setSelection(0);
+                    break;
+                case "2":
+                    spinner.setSelection(1);
+                    break;
+                case "3":
+                    spinner.setSelection(2);
+                    break;
+            }
+        }
+    }
+
+    public static void setPositionByGroup(Spinner spinner, String group) {
+        if (!TextUtils.isEmpty(group)) {
+            switch (group) {
+                case "A":
+                    spinner.setSelection(0);
+                    break;
+                case "B":
+                    spinner.setSelection(1);
+                    break;
+                case "C":
+                    spinner.setSelection(2);
+                    break;
+                case "D":
+                    spinner.setSelection(3);
+                    break;
+            }
+        }
+    }
+
+    public static void setPositionByTurn(Spinner spinner, String turn) {
+        if (!TextUtils.isEmpty(turn)) {
+            switch (turn) {
+                case "Matutino":
+                    spinner.setSelection(0);
+                    break;
+                case "Vespertino":
+                    spinner.setSelection(1);
+                    break;
+            }
+        }
+    }
+
+    public static int setPositionByKindergarten(Spinner spinner, String kinder) {
         int position = 0;
         for (int i = 0; i < spinner.getCount(); i++) {
-            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(s)) {
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(kinder)) {
                 position = i;
             }
         }
@@ -120,5 +202,49 @@ public class MyTools {
                 Snackbar.make(coordinatorLayout, "Error al obtener la información de los docentes", Snackbar.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public static void compareDataString(ArrayList<String> strings, String text, CoordinatorLayout coordinatorLayout, String error) {
+        if (strings != null && !strings.isEmpty()) {
+            for (String s : strings) {
+                if (s.equals(text)) {
+                    Snackbar.make(coordinatorLayout, error, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        }
+    }
+
+    public static void compareDataNumbers(ArrayList<Long> longs, long number, CoordinatorLayout coordinatorLayout, String error) {
+        if (longs != null && !longs.isEmpty()) {
+            for (Long l : longs) {
+                if (l == number) {
+                    Snackbar.make(coordinatorLayout, error, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        }
+    }
+
+    public static void deleteCurrentInformationString(ArrayList<String> strings, String text) {
+        if (strings != null && !strings.isEmpty()) {
+            for (int i = 0; i < strings.size(); i++) {
+                if (strings.get(i).equals(text)) {
+                    strings.remove(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void deleteCurrentInformationNumbers(ArrayList<Long> longs, long number) {
+        if (longs != null && !longs.isEmpty()) {
+            for (int i = 0; i < longs.size(); i++) {
+                if (longs.get(i) == number) {
+                    longs.remove(i);
+                    break;
+                }
+            }
+        }
     }
 }

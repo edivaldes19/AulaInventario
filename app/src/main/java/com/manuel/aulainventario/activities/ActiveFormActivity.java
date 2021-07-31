@@ -1,5 +1,14 @@
 package com.manuel.aulainventario.activities;
 
+import static com.manuel.aulainventario.utils.MyTools.calculateTotal;
+import static com.manuel.aulainventario.utils.MyTools.compareDataNumbers;
+import static com.manuel.aulainventario.utils.MyTools.compareDataString;
+import static com.manuel.aulainventario.utils.MyTools.deleteCurrentInformationNumbers;
+import static com.manuel.aulainventario.utils.MyTools.deleteCurrentInformationString;
+import static com.manuel.aulainventario.utils.MyTools.setPositionByCondition;
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
+
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,7 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
@@ -25,16 +34,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.manuel.aulainventario.utils.MyTools.calculateTotal;
-import static com.manuel.aulainventario.utils.MyTools.getLastPositionOfASpinner;
-import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
-
 public class ActiveFormActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
     TextInputEditText mEditTextNumberA, mEditTextKeyA, mEditTextDescriptionA, mEditTextAmountA, mEditTextPriceA, mEditTextTotalA;
     MaterialTextView mTextViewConditionSelectedA;
     Spinner mSpinnerA;
-    FloatingActionButton mFabClearA, mFabAddA;
+    MaterialButton mButtonClearA, mButtonAddA;
     AuthProvider mAuthProvider;
     CollectionsProvider mCollectionsProvider, mCollectionsProviderForNumbers;
     ActiveProvider mActiveProvider;
@@ -56,8 +61,8 @@ public class ActiveFormActivity extends AppCompatActivity {
         mEditTextTotalA = findViewById(R.id.textInputTotalA);
         mTextViewConditionSelectedA = findViewById(R.id.textViewConditionSelectedA);
         mSpinnerA = findViewById(R.id.spinnerConditionA);
-        mFabClearA = findViewById(R.id.fabClearA);
-        mFabAddA = findViewById(R.id.fabAddA);
+        mButtonClearA = findViewById(R.id.btnCleanFormActive);
+        mButtonAddA = findViewById(R.id.btnAddActive);
         mAuthProvider = new AuthProvider();
         mCollectionsProvider = new CollectionsProvider(this, "Conditions");
         mCollectionsProviderForNumbers = new CollectionsProvider(this, "Active");
@@ -93,16 +98,18 @@ public class ActiveFormActivity extends AppCompatActivity {
         validateFieldsAsYouType(mEditTextTotalA, "El total es obligatorio");
         calculateTotal(mEditTextAmountA, mEditTextPriceA, mEditTextTotalA);
         calculateTotal(mEditTextPriceA, mEditTextAmountA, mEditTextTotalA);
-        mFabClearA.setOnClickListener(v -> cleanForm());
-        mFabAddA.setOnClickListener(v -> addOrEditFixedAsset());
+        mButtonClearA.setOnClickListener(v -> cleanForm());
+        mButtonAddA.setOnClickListener(v -> addOrEditFixedAsset());
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onStart() {
         super.onStart();
         if (getIntent().getBooleanExtra("activeSelect", false)) {
             getActive();
-            mFabAddA.setImageResource(R.drawable.ic_edit);
+            mButtonAddA.setIconResource(R.drawable.ic_edit);
+            mButtonAddA.setText("Editar");
         }
     }
 
@@ -130,22 +137,8 @@ public class ActiveFormActivity extends AppCompatActivity {
                                                 double total = Double.parseDouble(totalField);
                                                 if (total != 0) {
                                                     if (!TextUtils.isEmpty(condition)) {
-                                                        if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                                            for (Long aLong : mNumbersList) {
-                                                                if (aLong == number) {
-                                                                    Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                                                    return;
-                                                                }
-                                                            }
-                                                        }
-                                                        if (mKeysList != null && !mKeysList.isEmpty()) {
-                                                            for (String s : mKeysList) {
-                                                                if (s.equals(key)) {
-                                                                    Snackbar.make(coordinatorLayout, "Ya existe un registro con esa clave", Snackbar.LENGTH_SHORT).show();
-                                                                    return;
-                                                                }
-                                                            }
-                                                        }
+                                                        compareDataNumbers(mNumbersList, number, coordinatorLayout, "Ya existe un registro con ese número");
+                                                        compareDataString(mKeysList, key, coordinatorLayout, "Ya existe un registro con esa clave");
                                                         Active active = new Active();
                                                         active.setId(mExtraIdActiveUpdate);
                                                         active.setNumber(number);
@@ -213,22 +206,8 @@ public class ActiveFormActivity extends AppCompatActivity {
                                                 double total = Double.parseDouble(totalField);
                                                 if (total != 0) {
                                                     if (!TextUtils.isEmpty(condition)) {
-                                                        if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                                            for (Long aLong : mNumbersList) {
-                                                                if (aLong == number) {
-                                                                    Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                                                    return;
-                                                                }
-                                                            }
-                                                        }
-                                                        if (mKeysList != null && !mKeysList.isEmpty()) {
-                                                            for (String s : mKeysList) {
-                                                                if (s.equals(key)) {
-                                                                    Snackbar.make(coordinatorLayout, "Ya existe un registro con esa clave", Snackbar.LENGTH_SHORT).show();
-                                                                    return;
-                                                                }
-                                                            }
-                                                        }
+                                                        compareDataNumbers(mNumbersList, number, coordinatorLayout, "Ya existe un registro con ese número");
+                                                        compareDataString(mKeysList, key, coordinatorLayout, "Ya existe un registro con esa clave");
                                                         Active active = new Active();
                                                         active.setNumber(number);
                                                         active.setKey(key);
@@ -283,26 +262,12 @@ public class ActiveFormActivity extends AppCompatActivity {
                 if (documentSnapshot.contains("number")) {
                     long number = documentSnapshot.getLong("number");
                     mEditTextNumberA.setText(String.valueOf(number));
-                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                        for (int i = 0; i < mNumbersList.size(); i++) {
-                            if (mNumbersList.get(i) == number) {
-                                mNumbersList.remove(i);
-                                break;
-                            }
-                        }
-                    }
+                    deleteCurrentInformationNumbers(mNumbersList, number);
                 }
                 if (documentSnapshot.contains("key")) {
                     String key = documentSnapshot.getString("key");
                     mEditTextKeyA.setText(key);
-                    if (mKeysList != null && !mKeysList.isEmpty()) {
-                        for (int i = 0; i < mKeysList.size(); i++) {
-                            if (mKeysList.get(i).equals(key)) {
-                                mKeysList.remove(i);
-                                break;
-                            }
-                        }
-                    }
+                    deleteCurrentInformationString(mKeysList, key);
                 }
                 if (documentSnapshot.contains("description")) {
                     String description = documentSnapshot.getString("description");
@@ -322,7 +287,7 @@ public class ActiveFormActivity extends AppCompatActivity {
                 }
                 if (documentSnapshot.contains("condition")) {
                     String condition = documentSnapshot.getString("condition");
-                    mSpinnerA.setSelection(getLastPositionOfASpinner(mSpinnerA, condition));
+                    setPositionByCondition(mSpinnerA, condition);
                 }
             }
             mProgressDialogGetting.dismiss();

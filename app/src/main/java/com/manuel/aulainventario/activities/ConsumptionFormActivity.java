@@ -1,5 +1,6 @@
 package com.manuel.aulainventario.activities;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -10,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.manuel.aulainventario.R;
@@ -23,12 +24,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
+import static com.manuel.aulainventario.utils.MyTools.compareDataNumbers;
+import static com.manuel.aulainventario.utils.MyTools.deleteCurrentInformationNumbers;
 import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
 
 public class ConsumptionFormActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
     TextInputEditText mEditTextNumberC, mEditTextDescriptionC, mEditTextAmountC;
-    FloatingActionButton mFabClearC, mFabAddC;
+    MaterialButton mButtonClearC, mButtonAddC;
     AuthProvider mAuthProvider;
     ConsumptionProvider mConsumptionProvider;
     CollectionsProvider mCollectionsProviderForNumbers;
@@ -44,8 +47,8 @@ public class ConsumptionFormActivity extends AppCompatActivity {
         mEditTextNumberC = findViewById(R.id.textInputNumberC);
         mEditTextDescriptionC = findViewById(R.id.textInputDescriptionC);
         mEditTextAmountC = findViewById(R.id.textInputAmountC);
-        mFabClearC = findViewById(R.id.fabClearC);
-        mFabAddC = findViewById(R.id.fabAddC);
+        mButtonClearC = findViewById(R.id.btnCleanFormConsumption);
+        mButtonAddC = findViewById(R.id.btnAddConsumption);
         mAuthProvider = new AuthProvider();
         mConsumptionProvider = new ConsumptionProvider();
         mCollectionsProviderForNumbers = new CollectionsProvider(this, "Consumption");
@@ -71,16 +74,18 @@ public class ConsumptionFormActivity extends AppCompatActivity {
         validateFieldsAsYouType(mEditTextNumberC, "El número es obligatorio");
         validateFieldsAsYouType(mEditTextDescriptionC, "La descripción es obligatoria");
         validateFieldsAsYouType(mEditTextAmountC, "La cantidad es obligatoria");
-        mFabClearC.setOnClickListener(v -> cleanForm());
-        mFabAddC.setOnClickListener(v -> addOrEditConsumables());
+        mButtonClearC.setOnClickListener(v -> cleanForm());
+        mButtonAddC.setOnClickListener(v -> addOrEditConsumables());
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onStart() {
         super.onStart();
         if (getIntent().getBooleanExtra("consumptionSelect", false)) {
             getConsumption();
-            mFabAddC.setImageResource(R.drawable.ic_edit);
+            mButtonAddC.setIconResource(R.drawable.ic_edit);
+            mButtonAddC.setText("Editar");
         }
     }
 
@@ -96,14 +101,7 @@ public class ConsumptionFormActivity extends AppCompatActivity {
                         if (!TextUtils.isEmpty(amountField)) {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
-                                if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                    for (Long aLong : mNumbersList) {
-                                        if (aLong == number) {
-                                            Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                            return;
-                                        }
-                                    }
-                                }
+                                compareDataNumbers(mNumbersList, number, coordinatorLayout, "Ya existe un registro con ese número");
                                 Consumption consumption = new Consumption();
                                 consumption.setId(mExtraIdConsumptionUpdate);
                                 consumption.setNumber(number);
@@ -137,14 +135,7 @@ public class ConsumptionFormActivity extends AppCompatActivity {
                         if (!TextUtils.isEmpty(amountField)) {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
-                                if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                    for (Long aLong : mNumbersList) {
-                                        if (aLong == number) {
-                                            Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                            return;
-                                        }
-                                    }
-                                }
+                                compareDataNumbers(mNumbersList, number, coordinatorLayout, "Ya existe un registro con ese número");
                                 Consumption consumption = new Consumption();
                                 consumption.setNumber(number);
                                 consumption.setDescription(description);
@@ -177,14 +168,7 @@ public class ConsumptionFormActivity extends AppCompatActivity {
                 if (documentSnapshot.contains("number")) {
                     long number = documentSnapshot.getLong("number");
                     mEditTextNumberC.setText(String.valueOf(number));
-                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                        for (int i = 0; i < mNumbersList.size(); i++) {
-                            if (mNumbersList.get(i) == number) {
-                                mNumbersList.remove(i);
-                                break;
-                            }
-                        }
-                    }
+                    deleteCurrentInformationNumbers(mNumbersList, number);
                 }
                 if (documentSnapshot.contains("description")) {
                     String description = documentSnapshot.getString("description");

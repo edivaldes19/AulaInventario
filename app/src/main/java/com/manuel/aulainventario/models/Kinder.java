@@ -1,16 +1,17 @@
 package com.manuel.aulainventario.models;
 
 public class Kinder {
-    private String id, name, address, gardenKey;
+    private String id, name, address, gardenKey, referenceImageUrl;
 
     public Kinder() {
     }
 
-    public Kinder(String id, String name, String address, String gardenKey) {
+    public Kinder(String id, String name, String address, String gardenKey, String referenceImageUrl) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.gardenKey = gardenKey;
+        this.referenceImageUrl = referenceImageUrl;
     }
 
     public String getId() {
@@ -43,6 +44,14 @@ public class Kinder {
 
     public void setGardenKey(String gardenKey) {
         this.gardenKey = gardenKey;
+    }
+
+    public String getReferenceImageUrl() {
+        return referenceImageUrl;
+    }
+
+    public void setReferenceImageUrl(String referenceImageUrl) {
+        this.referenceImageUrl = referenceImageUrl;
     }
 
     @Override

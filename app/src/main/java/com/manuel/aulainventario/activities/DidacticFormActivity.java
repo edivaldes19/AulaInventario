@@ -1,5 +1,11 @@
 package com.manuel.aulainventario.activities;
 
+import static com.manuel.aulainventario.utils.MyTools.compareDataNumbers;
+import static com.manuel.aulainventario.utils.MyTools.deleteCurrentInformationNumbers;
+import static com.manuel.aulainventario.utils.MyTools.setPositionByCondition;
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
+
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,7 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
@@ -25,15 +31,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.manuel.aulainventario.utils.MyTools.getLastPositionOfASpinner;
-import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
-
 public class DidacticFormActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
     TextInputEditText mEditTextNumberD, mEditTextDescriptionD, mEditTextAmountD;
     MaterialTextView mTextViewConditionSelectedD;
     Spinner mSpinnerD;
-    FloatingActionButton mFabClearD, mFabAddD;
+    MaterialButton mButtonClearD, mButtonAddD;
     AuthProvider mAuthProvider;
     CollectionsProvider mCollectionsProvider, mCollectionsProviderForNumbers;
     DidacticProvider mDidacticProvider;
@@ -52,8 +55,8 @@ public class DidacticFormActivity extends AppCompatActivity {
         mEditTextAmountD = findViewById(R.id.textInputAmountD);
         mTextViewConditionSelectedD = findViewById(R.id.textViewConditionSelectedD);
         mSpinnerD = findViewById(R.id.spinnerConditionD);
-        mFabClearD = findViewById(R.id.fabClearD);
-        mFabAddD = findViewById(R.id.fabAddD);
+        mButtonClearD = findViewById(R.id.btnCleanFormDidactic);
+        mButtonAddD = findViewById(R.id.btnAddDidactic);
         mAuthProvider = new AuthProvider();
         mCollectionsProvider = new CollectionsProvider(this, "Conditions");
         mCollectionsProviderForNumbers = new CollectionsProvider(this, "Didactic");
@@ -82,16 +85,18 @@ public class DidacticFormActivity extends AppCompatActivity {
         validateFieldsAsYouType(mEditTextNumberD, "El número es obligatorio");
         validateFieldsAsYouType(mEditTextDescriptionD, "La descripción es obligatoria");
         validateFieldsAsYouType(mEditTextAmountD, "La cantidad es obligatoria");
-        mFabClearD.setOnClickListener(v -> cleanForm());
-        mFabAddD.setOnClickListener(v -> addOrEditTeachingMaterials());
+        mButtonClearD.setOnClickListener(v -> cleanForm());
+        mButtonAddD.setOnClickListener(v -> addOrEditTeachingMaterials());
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onStart() {
         super.onStart();
         if (getIntent().getBooleanExtra("didacticSelect", false)) {
             getDidactic();
-            mFabAddD.setImageResource(R.drawable.ic_edit);
+            mButtonAddD.setIconResource(R.drawable.ic_edit);
+            mButtonAddD.setText("Editar");
         }
     }
 
@@ -109,14 +114,7 @@ public class DidacticFormActivity extends AppCompatActivity {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
                                 if (!TextUtils.isEmpty(condition)) {
-                                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                        for (Long aLong : mNumbersList) {
-                                            if (aLong == number) {
-                                                Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                                return;
-                                            }
-                                        }
-                                    }
+                                    compareDataNumbers(mNumbersList, number, coordinatorLayout, "Ya existe un registro con ese número");
                                     Didactic didactic = new Didactic();
                                     didactic.setId(mExtraIdDidacticUpdate);
                                     didactic.setNumber(number);
@@ -156,14 +154,7 @@ public class DidacticFormActivity extends AppCompatActivity {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
                                 if (!TextUtils.isEmpty(condition)) {
-                                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                        for (Long aLong : mNumbersList) {
-                                            if (aLong == number) {
-                                                Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                                return;
-                                            }
-                                        }
-                                    }
+                                    compareDataNumbers(mNumbersList, number, coordinatorLayout, "Ya existe un registro con ese número");
                                     Didactic didactic = new Didactic();
                                     didactic.setNumber(number);
                                     didactic.setDescription(description);
@@ -200,14 +191,7 @@ public class DidacticFormActivity extends AppCompatActivity {
                 if (documentSnapshot.contains("number")) {
                     long number = documentSnapshot.getLong("number");
                     mEditTextNumberD.setText(String.valueOf(number));
-                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                        for (int i = 0; i < mNumbersList.size(); i++) {
-                            if (mNumbersList.get(i) == number) {
-                                mNumbersList.remove(i);
-                                break;
-                            }
-                        }
-                    }
+                    deleteCurrentInformationNumbers(mNumbersList, number);
                 }
                 if (documentSnapshot.contains("description")) {
                     String description = documentSnapshot.getString("description");
@@ -219,7 +203,7 @@ public class DidacticFormActivity extends AppCompatActivity {
                 }
                 if (documentSnapshot.contains("condition")) {
                     String condition = documentSnapshot.getString("condition");
-                    mSpinnerD.setSelection(getLastPositionOfASpinner(mSpinnerD, condition));
+                    setPositionByCondition(mSpinnerD, condition);
                 }
             }
             mProgressDialogGetting.dismiss();

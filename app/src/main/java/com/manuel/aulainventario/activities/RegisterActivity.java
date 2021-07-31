@@ -1,5 +1,12 @@
 package com.manuel.aulainventario.activities;
 
+import static com.manuel.aulainventario.utils.MyTools.compareDataString;
+import static com.manuel.aulainventario.utils.MyTools.compareTeachersInformation;
+import static com.manuel.aulainventario.utils.MyTools.isEmailValid;
+import static com.manuel.aulainventario.utils.MyTools.isTeacherInfoExist;
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
+import static com.manuel.aulainventario.utils.MyTools.validatePasswordFieldsAsYouType;
+
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -32,11 +39,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
-import static com.manuel.aulainventario.utils.MyTools.compareTeachersInformation;
-import static com.manuel.aulainventario.utils.MyTools.isEmailValid;
-import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
-import static com.manuel.aulainventario.utils.MyTools.validatePasswordFieldsAsYouType;
 
 public class RegisterActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
@@ -99,8 +101,8 @@ public class RegisterActivity extends AppCompatActivity {
         validateFieldsAsYouType(mTextInputPhone, "El número de teléfono es obligatorio");
         validatePasswordFieldsAsYouType(mTextInputPasswordR, "La contraseña es obligatoria");
         validatePasswordFieldsAsYouType(mTextInputConfirmPasswordR, "Debe confirmar su contraseña");
-        isTeacherInfoExist(mTeachernameList, "teachername");
-        isTeacherInfoExist(mPhoneList, "phone");
+        isTeacherInfoExist(coordinatorLayout, mTeachersProvider, mTeachernameList, "teachername");
+        isTeacherInfoExist(coordinatorLayout, mTeachersProvider, mPhoneList, "phone");
         getAllKindergartens();
         mImageViewBack.setOnClickListener(v -> finish());
         materialButtonRegister.setOnClickListener(v -> normalRegister());
@@ -125,22 +127,8 @@ public class RegisterActivity extends AppCompatActivity {
                                 if (!TextUtils.isEmpty(group)) {
                                     if (!TextUtils.isEmpty(password)) {
                                         if (!TextUtils.isEmpty(confirmPassword)) {
-                                            if (mTeachernameList != null && !mTeachernameList.isEmpty()) {
-                                                for (String s : mTeachernameList) {
-                                                    if (s.equals(teachername)) {
-                                                        Snackbar.make(coordinatorLayout, "Ya existe un docente con ese nombre", Snackbar.LENGTH_SHORT).show();
-                                                        return;
-                                                    }
-                                                }
-                                            }
-                                            if (mPhoneList != null && !mPhoneList.isEmpty()) {
-                                                for (String s : mPhoneList) {
-                                                    if (s.equals(phone)) {
-                                                        Snackbar.make(coordinatorLayout, "Ya existe un docente con ese teléfono", Snackbar.LENGTH_SHORT).show();
-                                                        return;
-                                                    }
-                                                }
-                                            }
+                                            compareDataString(mTeachernameList, teachername, coordinatorLayout, "Ya existe un docente con ese nombre");
+                                            compareDataString(mPhoneList, phone, coordinatorLayout, "Ya existe un docente con ese teléfono");
                                             compareTeachersInformation(mTeachersProvider, coordinatorLayout, mTeacherList);
                                             if (mTeacherList != null && !mTeacherList.isEmpty()) {
                                                 for (int i = 0; i < mTeacherList.size(); i++) {
@@ -192,23 +180,6 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    private void isTeacherInfoExist(ArrayList<String> stringList, String field) {
-        mTeachersProvider.getAllTeacherDocuments().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
-                    if (snapshot.exists()) {
-                        if (snapshot.contains(field)) {
-                            String allFields = snapshot.getString(field);
-                            stringList.add(allFields);
-                        }
-                    }
-                }
-            } else {
-                Snackbar.make(coordinatorLayout, "Error al obtener la información de los docentes", Snackbar.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     public void getAllKindergartens() {
         List<Kinder> kinderList = new ArrayList<>();
         mKinderProvider.getAllDocuments().addOnCompleteListener(task -> {
@@ -218,7 +189,7 @@ public class RegisterActivity extends AppCompatActivity {
                         if (snapshot.contains("id") && snapshot.contains("name")) {
                             String ids = snapshot.getString("id");
                             String names = snapshot.getString("name");
-                            kinderList.add(new Kinder(ids, names, null, null));
+                            kinderList.add(new Kinder(ids, names, null, null, null));
                         }
                     }
                 }

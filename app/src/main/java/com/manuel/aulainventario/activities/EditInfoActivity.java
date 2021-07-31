@@ -1,5 +1,14 @@
 package com.manuel.aulainventario.activities;
 
+import static com.manuel.aulainventario.utils.MyTools.compareDataString;
+import static com.manuel.aulainventario.utils.MyTools.compareTeachersInformation;
+import static com.manuel.aulainventario.utils.MyTools.deleteCurrentInformationString;
+import static com.manuel.aulainventario.utils.MyTools.setPositionByGrade;
+import static com.manuel.aulainventario.utils.MyTools.setPositionByGroup;
+import static com.manuel.aulainventario.utils.MyTools.setPositionByKindergarten;
+import static com.manuel.aulainventario.utils.MyTools.setPositionByTurn;
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
+
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -32,10 +41,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
-import static com.manuel.aulainventario.utils.MyTools.compareTeachersInformation;
-import static com.manuel.aulainventario.utils.MyTools.getLastPositionOfASpinner;
-import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
 
 public class EditInfoActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
@@ -124,22 +129,13 @@ public class EditInfoActivity extends AppCompatActivity {
                     if (!TextUtils.isEmpty(turn)) {
                         if (!TextUtils.isEmpty(grade)) {
                             if (!TextUtils.isEmpty(group)) {
-                                if (mTeachernameList != null && !mTeachernameList.isEmpty()) {
-                                    for (String s : mTeachernameList) {
-                                        if (s.equals(teachername)) {
-                                            Snackbar.make(coordinatorLayout, "Ya existe un docente con ese nombre", Snackbar.LENGTH_SHORT).show();
-                                            return;
-                                        }
-                                    }
-                                }
-                                if (mPhoneList != null && !mPhoneList.isEmpty()) {
-                                    for (String s : mPhoneList) {
-                                        if (s.equals(phone)) {
-                                            Snackbar.make(coordinatorLayout, "Ya existe un docente con ese teléfono", Snackbar.LENGTH_SHORT).show();
-                                            return;
-                                        }
-                                    }
-                                }
+                                deleteCurrentInformationString(mTeachernameList, teachername);
+                                deleteCurrentInformationString(mPhoneList, phone);
+                                deleteCurrentInformationString(mShiftsList, turn);
+                                deleteCurrentInformationString(mGradesList, grade);
+                                deleteCurrentInformationString(mGroupsList, group);
+                                compareDataString(mTeachernameList, teachername, coordinatorLayout, "Ya existe un docente con ese nombre");
+                                compareDataString(mPhoneList, phone, coordinatorLayout, "Ya existe un docente con ese teléfono");
                                 compareTeachersInformation(mTeachersProvider, coordinatorLayout, mTeacherList);
                                 if (mTeacherList != null && !mTeacherList.isEmpty()) {
                                     for (int i = 0; i < mTeacherList.size(); i++) {
@@ -182,7 +178,7 @@ public class EditInfoActivity extends AppCompatActivity {
                                 if (documentSnapshot1.contains("name")) {
                                     String name = documentSnapshot1.getString("name");
                                     mTextViewKinderSelected.setText(name);
-                                    mSpinnerKinder.setSelection(getLastPositionOfASpinner(mSpinnerKinder, name));
+                                    mSpinnerKinder.setSelection(setPositionByKindergarten(mSpinnerKinder, name));
                                 }
                             }
                         });
@@ -191,62 +187,22 @@ public class EditInfoActivity extends AppCompatActivity {
                 if (documentSnapshot.contains("teachername")) {
                     String teachername = documentSnapshot.getString("teachername");
                     mTextInputTeachername.setText(teachername);
-                    if (mTeachernameList != null && !mTeachernameList.isEmpty()) {
-                        for (int i = 0; i < mTeachernameList.size(); i++) {
-                            if (mTeachernameList.get(i).equals(teachername)) {
-                                mTeachernameList.remove(i);
-                                break;
-                            }
-                        }
-                    }
                 }
                 if (documentSnapshot.contains("phone")) {
                     String phone = documentSnapshot.getString("phone");
                     mTextInputPhone.setText(phone);
-                    if (mPhoneList != null && !mPhoneList.isEmpty()) {
-                        for (int i = 0; i < mPhoneList.size(); i++) {
-                            if (mPhoneList.get(i).equals(phone)) {
-                                mPhoneList.remove(i);
-                                break;
-                            }
-                        }
-                    }
                 }
                 if (documentSnapshot.contains("turn")) {
                     String turn = documentSnapshot.getString("turn");
-                    mSpinnerTurn.setSelection(getLastPositionOfASpinner(mSpinnerTurn, turn));
-                    if (mShiftsList != null && !mShiftsList.isEmpty()) {
-                        for (int i = 0; i < mShiftsList.size(); i++) {
-                            if (mShiftsList.get(i).equals(turn)) {
-                                mShiftsList.remove(i);
-                                break;
-                            }
-                        }
-                    }
+                    setPositionByTurn(mSpinnerTurn, turn);
                 }
                 if (documentSnapshot.contains("grade")) {
                     String grade = documentSnapshot.getString("grade");
-                    mSpinnerGrade.setSelection(getLastPositionOfASpinner(mSpinnerGrade, grade));
-                    if (mGradesList != null && !mGradesList.isEmpty()) {
-                        for (int i = 0; i < mGradesList.size(); i++) {
-                            if (mGradesList.get(i).equals(grade)) {
-                                mGradesList.remove(i);
-                                break;
-                            }
-                        }
-                    }
+                    setPositionByGrade(mSpinnerGrade, grade);
                 }
                 if (documentSnapshot.contains("group")) {
                     String group = documentSnapshot.getString("group");
-                    mSpinnerGroup.setSelection(getLastPositionOfASpinner(mSpinnerGroup, group));
-                    if (mGroupsList != null && !mGroupsList.isEmpty()) {
-                        for (int i = 0; i < mGroupsList.size(); i++) {
-                            if (mGroupsList.get(i).equals(group)) {
-                                mGroupsList.remove(i);
-                                break;
-                            }
-                        }
-                    }
+                    setPositionByGroup(mSpinnerGroup, group);
                 }
             }
             mProgressDialogGetting.dismiss();
@@ -279,7 +235,7 @@ public class EditInfoActivity extends AppCompatActivity {
                         if (snapshot.contains("id") && snapshot.contains("name")) {
                             String ids = snapshot.getString("id");
                             String names = snapshot.getString("name");
-                            kinderList.add(new Kinder(ids, names, null, null));
+                            kinderList.add(new Kinder(ids, names, null, null, null));
                         }
                     }
                 }

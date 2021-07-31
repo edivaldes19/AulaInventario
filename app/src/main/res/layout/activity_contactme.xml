@@ -50,7 +50,7 @@
                         android:id="@+id/textViewContactame"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/contactMe"
+                        android:text="@string/complaintsAndSuggestions"
                         android:textAlignment="center"
                         android:textColor="@color/white"
                         android:textSize="24sp"

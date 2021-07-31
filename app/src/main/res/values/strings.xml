@@ -20,7 +20,7 @@
     <string name="direction">Dirección/Ubicación</string>
     <string name="delete">Eliminar</string>
     <string name="about">Acerca de</string>
-    <string name="contactMe">Contáctame</string>
+    <string name="complaintsAndSuggestions">Quejas y sugerencias</string>
     <string name="signOut">Cerrar sesión</string>
     <string name="number">Número</string>
     <string name="description">Descripción</string>
@@ -41,7 +41,7 @@
     <string name="back">VOLVER</string>
     <string name="price">Precio</string>
     <string name="total">Total</string>
-    <string name="seeMyInformation">Ver mi info.</string>
+    <string name="seeMyInformation">Ver mi información</string>
     <string name="zone">Zona</string>
     <string name="sector">Sector</string>
     <string name="group">Grupo</string>
@@ -57,8 +57,9 @@
     <string name="editMyInformation">Editar mi información</string>
     <string name="EditMe">Editar información</string>
     <string name="title_activity_maps">Map</string>
-    <string name="seeMap">Ver mapa</string>
+    <string name="seeGardenMap">Ver mapa de jardines</string>
     <string name="satelliteView">Vista de satélite</string>
     <string name="pushSearch">Oprime aquí para buscar…</string>
     <string name="createNewRegister">Crear un nuevo registro</string>
+    <string name="cleanForm">Limpiar formulario/Vaciar casillas</string>
 </resources>

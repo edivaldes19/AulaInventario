@@ -1,5 +1,6 @@
 package com.manuel.aulainventario.activities;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -15,34 +16,41 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.manuel.aulainventario.R;
+import com.manuel.aulainventario.models.Kinder;
 import com.manuel.aulainventario.providers.KinderProvider;
+import com.ortiz.touchview.TouchImageView;
+import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     final LatLng mUruapan = new LatLng(19.4147269, -102.0522647);
-    KinderProvider mKinderProvider;
+    KinderProvider kinderProvider;
+    MaterialTextView mTextViewNameKinder, mTextViewGardenKey, mTextViewAddressKinder;
+    TouchImageView mTouchImageViewReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setTitle("Mapa de jardines");
-        mKinderProvider = new KinderProvider();
+        kinderProvider = new KinderProvider();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         checkInternetConnection();
@@ -52,17 +60,43 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         CameraPosition camera = new CameraPosition.Builder().target(mUruapan).zoom(13).bearing(0).tilt(0).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(mUruapan));
-        mKinderProvider.getAllDocuments().addOnCompleteListener((OnCompleteListener<QuerySnapshot>) task -> {
+        googleMap.setOnMarkerClickListener(marker -> {
+            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MapsActivity.this);
+            bottomSheetDialog.setContentView(R.layout.custom_bottom_sheet);
+            bottomSheetDialog.setCancelable(false);
+            bottomSheetDialog.setCanceledOnTouchOutside(true);
+            mTextViewNameKinder = bottomSheetDialog.findViewById(R.id.sheetNameKinder);
+            mTextViewGardenKey = bottomSheetDialog.findViewById(R.id.sheetGardenKey);
+            mTextViewAddressKinder = bottomSheetDialog.findViewById(R.id.sheetAddressKinder);
+            mTouchImageViewReference = bottomSheetDialog.findViewById(R.id.sheetImageViewReferenceImage);
+            if (marker.getTag() != null) {
+                Kinder kinder = (Kinder) marker.getTag();
+                mTextViewNameKinder.setText("J/N " + kinder.getName());
+                mTextViewGardenKey.setText("Clave: " + kinder.getGardenKey());
+                mTextViewAddressKinder.setText("Dirección: " + kinder.getAddress());
+                Picasso.get().load(kinder.getReferenceImageUrl()).placeholder(R.drawable.ic_cloud_download).into(mTouchImageViewReference);
+            }
+            bottomSheetDialog.show();
+            return true;
+        });
+        kinderProvider.getAllDocuments().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                    if (document.exists()) {
-                        if (document.contains("name") && document.contains("gardenKey") && document.contains("location")) {
-                            String name = document.getString("name");
-                            String gardenKey = document.getString("gardenKey");
-                            GeoPoint geoPoint = document.getGeoPoint("location");
+                for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
+                    if (snapshot.exists()) {
+                        if (snapshot.contains("gardenKey") && snapshot.contains("name") && snapshot.contains("address") && snapshot.contains("referenceImageUrl") && snapshot.contains("location")) {
+                            String key = snapshot.getString("gardenKey");
+                            String name = snapshot.getString("name");
+                            String address = snapshot.getString("address");
+                            String referenceImageUrl = snapshot.getString("referenceImageUrl");
+                            Kinder kinder = new Kinder();
+                            kinder.setGardenKey(key);
+                            kinder.setName(name);
+                            kinder.setAddress(address);
+                            kinder.setReferenceImageUrl(referenceImageUrl);
+                            GeoPoint geoPoint = snapshot.getGeoPoint("location");
                             if (geoPoint != null) {
                                 LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
-                                googleMap.addMarker(new MarkerOptions().position(latLng).title(name).snippet(gardenKey));
+                                Objects.requireNonNull(googleMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).alpha(0.75f))).setTag(kinder);
                             }
                         }
                     }
@@ -79,7 +113,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         finish();
     }
 
-    public void checkInternetConnection() {
+    private void checkInternetConnection() {
         ConnectivityManager connectivityManager = (ConnectivityManager) MapsActivity.this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null && !networkInfo.isConnected()) {

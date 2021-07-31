@@ -7,7 +7,7 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/itemContactMe"
-        android:title="@string/contactMe"
+        android:title="@string/complaintsAndSuggestions"
         app:showAsAction="never" />
     <item
         android:id="@+id/itemMyProfile"
@@ -15,7 +15,7 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/itemMap"
-        android:title="@string/seeMap"
+        android:title="@string/seeGardenMap"
         app:showAsAction="never" />
     <item
         android:id="@+id/itemLogout"

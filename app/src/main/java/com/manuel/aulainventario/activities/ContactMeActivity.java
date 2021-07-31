@@ -1,5 +1,8 @@
 package com.manuel.aulainventario.activities;
 
+import static com.manuel.aulainventario.utils.MyTools.isEmailValid;
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
+
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -34,9 +37,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import static com.manuel.aulainventario.utils.MyTools.isEmailValid;
-import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
-
 public class ContactMeActivity extends AppCompatActivity {
     public static String reason;
     CoordinatorLayout coordinatorLayout;
@@ -50,7 +50,7 @@ public class ContactMeActivity extends AppCompatActivity {
     TeachersProvider mTeachersProvider;
     AuthProvider mAuthProvider;
 
-    @SuppressLint("RestrictedApi")
+    @SuppressLint({"RestrictedApi", "SetTextI18n"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,8 +67,8 @@ public class ContactMeActivity extends AppCompatActivity {
         mTeachersProvider = new TeachersProvider();
         mAuthProvider = new AuthProvider();
         validateFieldsAsYouType(textInputMessageForm, "El mensaje es obligatorio");
-        materialRadioButtonComplain.setOnClickListener(v -> mTextViewReasonSelected.setText(materialRadioButtonComplain.getText().toString().trim()));
-        materialRadioButtonSuggestion.setOnClickListener(v -> mTextViewReasonSelected.setText(materialRadioButtonSuggestion.getText().toString().trim()));
+        materialRadioButtonComplain.setOnClickListener(v -> mTextViewReasonSelected.setText("Motivo: " + materialRadioButtonComplain.getText().toString().trim()));
+        materialRadioButtonSuggestion.setOnClickListener(v -> mTextViewReasonSelected.setText("Motivo: " + materialRadioButtonSuggestion.getText().toString().trim()));
         MaterialButton buttonSend = findViewById(R.id.btnSendForm);
         buttonSend.setOnClickListener(view -> {
             int radioID = radioGroup.getCheckedRadioButtonId();

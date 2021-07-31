@@ -212,8 +212,8 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="30dp" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="wrap_content"
+            <HorizontalScrollView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="30dp"
@@ -221,41 +221,54 @@
                 android:layout_marginEnd="30dp"
                 android:layout_marginBottom="15dp">
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/fabClearA"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_clear"
-                    android:tooltipText="Limpiar formulario"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/spacerA"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="ContentDescription"
-                    tools:targetApi="o" />
+                    android:layout_gravity="center">
 
-                <androidx.legacy.widget.Space
-                    android:id="@+id/spacerA"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/fabAddA"
-                    app:layout_constraintStart_toEndOf="@id/fabClearA"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCleanFormActive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_clear"
+                        android:text="@string/clear"
+                        android:textAllCaps="false"
+                        android:tooltipText="@string/cleanForm"
+                        app:cornerRadius="@dimen/corner_radius_rounded"
+                        app:icon="@drawable/ic_clear"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/spacerA"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:targetApi="o" />
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/fabAddA"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_check"
-                    android:tooltipText="Agregar registro"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/spacerA"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="ContentDescription"
-                    tools:targetApi="o" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <androidx.legacy.widget.Space
+                        android:id="@+id/spacerA"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/btnAddActive"
+                        app:layout_constraintStart_toEndOf="@id/btnCleanFormActive"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddActive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_clear"
+                        android:text="@string/add"
+                        android:textAllCaps="false"
+                        android:tooltipText="Agregar registro de activo fijo"
+                        app:cornerRadius="@dimen/corner_radius_rounded"
+                        app:icon="@drawable/ic_check"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/spacerA"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="ContentDescription"
+                        tools:targetApi="o" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </HorizontalScrollView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
