@@ -1,10 +1,14 @@
 package com.manuel.aulainventario.activities;
 
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
+
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,18 +28,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.manuel.aulainventario.utils.MyTools.compareDataNumbers;
-import static com.manuel.aulainventario.utils.MyTools.deleteCurrentInformationNumbers;
-import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
-
 public class ConsumptionFormActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
+    ProgressBar mProgressBar;
     TextInputEditText mEditTextNumberC, mEditTextDescriptionC, mEditTextAmountC;
     MaterialButton mButtonClearC, mButtonAddC;
     AuthProvider mAuthProvider;
     ConsumptionProvider mConsumptionProvider;
     CollectionsProvider mCollectionsProviderForNumbers;
-    ProgressDialog mProgressDialog, mProgressDialogGetting;
+    ProgressDialog mProgressDialog;
     String mExtraIdConsumptionUpdate, mExtraConsumptionTitle;
     ArrayList<Long> mNumbersList;
 
@@ -44,6 +45,7 @@ public class ConsumptionFormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_consumption_form);
         coordinatorLayout = findViewById(R.id.coordinatorConsumption);
+        mProgressBar = findViewById(R.id.progress_circular_consumption);
         mEditTextNumberC = findViewById(R.id.textInputNumberC);
         mEditTextDescriptionC = findViewById(R.id.textInputDescriptionC);
         mEditTextAmountC = findViewById(R.id.textInputAmountC);
@@ -65,11 +67,6 @@ public class ConsumptionFormActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Por favor, espere un momento");
         mProgressDialog.setCancelable(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialogGetting = new ProgressDialog(this);
-        mProgressDialogGetting.setTitle("Obteniendo datos...");
-        mProgressDialogGetting.setMessage("Por favor, espere un momento");
-        mProgressDialogGetting.setCancelable(false);
-        mProgressDialogGetting.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mCollectionsProviderForNumbers.getNumbersByTeacher(mAuthProvider.getUid(), coordinatorLayout, mNumbersList);
         validateFieldsAsYouType(mEditTextNumberC, "El número es obligatorio");
         validateFieldsAsYouType(mEditTextDescriptionC, "La descripción es obligatoria");
@@ -101,7 +98,14 @@ public class ConsumptionFormActivity extends AppCompatActivity {
                         if (!TextUtils.isEmpty(amountField)) {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
-                                compareDataNumbers(mNumbersList, number, coordinatorLayout, "Ya existe un registro con ese número");
+                                if (mNumbersList != null && !mNumbersList.isEmpty()) {
+                                    for (long l : mNumbersList) {
+                                        if (l == number) {
+                                            Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                    }
+                                }
                                 Consumption consumption = new Consumption();
                                 consumption.setId(mExtraIdConsumptionUpdate);
                                 consumption.setNumber(number);
@@ -135,7 +139,14 @@ public class ConsumptionFormActivity extends AppCompatActivity {
                         if (!TextUtils.isEmpty(amountField)) {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
-                                compareDataNumbers(mNumbersList, number, coordinatorLayout, "Ya existe un registro con ese número");
+                                if (mNumbersList != null && !mNumbersList.isEmpty()) {
+                                    for (long l : mNumbersList) {
+                                        if (l == number) {
+                                            Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                    }
+                                }
                                 Consumption consumption = new Consumption();
                                 consumption.setNumber(number);
                                 consumption.setDescription(description);
@@ -162,13 +173,12 @@ public class ConsumptionFormActivity extends AppCompatActivity {
     }
 
     private void getConsumption() {
-        mProgressDialogGetting.show();
+        mProgressBar.setVisibility(View.VISIBLE);
         mConsumptionProvider.getConsumptionById(mExtraIdConsumptionUpdate).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("number")) {
                     long number = documentSnapshot.getLong("number");
                     mEditTextNumberC.setText(String.valueOf(number));
-                    deleteCurrentInformationNumbers(mNumbersList, number);
                 }
                 if (documentSnapshot.contains("description")) {
                     String description = documentSnapshot.getString("description");
@@ -179,7 +189,7 @@ public class ConsumptionFormActivity extends AppCompatActivity {
                     mEditTextAmountC.setText(String.valueOf(amount));
                 }
             }
-            mProgressDialogGetting.dismiss();
+            mProgressBar.setVisibility(View.GONE);
         });
     }
 

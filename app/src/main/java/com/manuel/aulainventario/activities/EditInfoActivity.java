@@ -1,8 +1,5 @@
 package com.manuel.aulainventario.activities;
 
-import static com.manuel.aulainventario.utils.MyTools.compareDataString;
-import static com.manuel.aulainventario.utils.MyTools.compareTeachersInformation;
-import static com.manuel.aulainventario.utils.MyTools.deleteCurrentInformationString;
 import static com.manuel.aulainventario.utils.MyTools.setPositionByGrade;
 import static com.manuel.aulainventario.utils.MyTools.setPositionByGroup;
 import static com.manuel.aulainventario.utils.MyTools.setPositionByKindergarten;
@@ -17,6 +14,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -44,6 +42,7 @@ import java.util.Objects;
 
 public class EditInfoActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
+    ProgressBar mProgressBar;
     ShapeableImageView mImageViewBack;
     TextInputEditText mTextInputTeachername, mTextInputPhone;
     MaterialTextView mTextViewKinderSelected, mTextViewTurnSelected, mTextViewGradeSelected, mTextViewGroupSelected;
@@ -53,8 +52,8 @@ public class EditInfoActivity extends AppCompatActivity {
     TeachersProvider mTeachersProvider;
     KinderProvider mKinderProvider;
     CollectionsProvider mCollectionsProviderKindergartens, mCollectionsProviderShifts, mCollectionsProviderGrades, mCollectionsProviderGroups;
-    ProgressDialog mDialog, mProgressDialogGetting;
-    ArrayList<String> mTeachernameList, mPhoneList, mShiftsList, mGradesList, mGroupsList;
+    ProgressDialog mDialog;
+    ArrayList<String> mShiftsList, mGradesList, mGroupsList;
     List<Teacher> mTeacherList;
     String mIdKinder;
 
@@ -63,6 +62,7 @@ public class EditInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_info);
         coordinatorLayout = findViewById(R.id.coordinatorEdit);
+        mProgressBar = findViewById(R.id.progress_circular_edit);
         mImageViewBack = findViewById(R.id.imageViewBack);
         mTextInputTeachername = findViewById(R.id.textInputTeachernameEdit);
         mTextInputPhone = findViewById(R.id.textInputPhoneEdit);
@@ -82,8 +82,6 @@ public class EditInfoActivity extends AppCompatActivity {
         mCollectionsProviderShifts = new CollectionsProvider(this, "Shifts");
         mCollectionsProviderGrades = new CollectionsProvider(this, "Grades");
         mCollectionsProviderGroups = new CollectionsProvider(this, "Groups");
-        mTeachernameList = new ArrayList<>();
-        mPhoneList = new ArrayList<>();
         mShiftsList = new ArrayList<>();
         mGradesList = new ArrayList<>();
         mGroupsList = new ArrayList<>();
@@ -93,18 +91,11 @@ public class EditInfoActivity extends AppCompatActivity {
         mDialog.setMessage("Por favor, espere un momento");
         mDialog.setCancelable(false);
         mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialogGetting = new ProgressDialog(this);
-        mProgressDialogGetting.setTitle("Obteniendo datos...");
-        mProgressDialogGetting.setMessage("Por favor, espere un momento");
-        mProgressDialogGetting.setCancelable(false);
-        mProgressDialogGetting.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mCollectionsProviderShifts.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mShiftsList, "turn", mSpinnerTurn, "Turno: ", mTextViewTurnSelected, "Error al obtener los turnos");
         mCollectionsProviderGrades.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGradesList, "grade", mSpinnerGrade, "Grado: ", mTextViewGradeSelected, "Error al obtener los grados");
         mCollectionsProviderGroups.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGroupsList, "group", mSpinnerGroup, "Grupo: ", mTextViewGroupSelected, "Error al obtener los grupos");
         validateFieldsAsYouType(mTextInputTeachername, "El nombre y apellido es obligatorio");
         validateFieldsAsYouType(mTextInputPhone, "El número de teléfono es obligatorio");
-        isUserInfoExist(mTeachernameList, "teachername");
-        isUserInfoExist(mPhoneList, "phone");
         getAllKindergartens();
         mImageViewBack.setOnClickListener(v -> finish());
         mButtonEdit.setOnClickListener(v -> editInfo());
@@ -129,22 +120,6 @@ public class EditInfoActivity extends AppCompatActivity {
                     if (!TextUtils.isEmpty(turn)) {
                         if (!TextUtils.isEmpty(grade)) {
                             if (!TextUtils.isEmpty(group)) {
-                                deleteCurrentInformationString(mTeachernameList, teachername);
-                                deleteCurrentInformationString(mPhoneList, phone);
-                                deleteCurrentInformationString(mShiftsList, turn);
-                                deleteCurrentInformationString(mGradesList, grade);
-                                deleteCurrentInformationString(mGroupsList, group);
-                                compareDataString(mTeachernameList, teachername, coordinatorLayout, "Ya existe un docente con ese nombre");
-                                compareDataString(mPhoneList, phone, coordinatorLayout, "Ya existe un docente con ese teléfono");
-                                compareTeachersInformation(mTeachersProvider, coordinatorLayout, mTeacherList);
-                                if (mTeacherList != null && !mTeacherList.isEmpty()) {
-                                    for (int i = 0; i < mTeacherList.size(); i++) {
-                                        if ((mTeacherList.get(i).getGrade().equals(grade)) && (mTeacherList.get(i).getGroup().equals(group)) && (mTeacherList.get(i).getTurn().equals(turn))) {
-                                            Snackbar.make(coordinatorLayout, "Ya existe un docente ocupando ese grupo", Snackbar.LENGTH_SHORT).show();
-                                            return;
-                                        }
-                                    }
-                                }
                                 updateUser(teachername, phone, turn, grade, group);
                             } else {
                                 Snackbar.make(coordinatorLayout, "Debe seleccionar un grupo", Snackbar.LENGTH_SHORT).show();
@@ -167,8 +142,9 @@ public class EditInfoActivity extends AppCompatActivity {
     }
 
     private void getTeacher() {
-        mProgressDialogGetting.show();
-        mTeachersProvider.getTeacher(mAuthProvider.getUid()).addOnSuccessListener(documentSnapshot -> {
+        String idTeacher = mAuthProvider.getUid();
+        mProgressBar.setVisibility(View.VISIBLE);
+        mTeachersProvider.getTeacher(idTeacher).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("idKinder")) {
                     String idKinder = documentSnapshot.getString("idKinder");
@@ -205,28 +181,11 @@ public class EditInfoActivity extends AppCompatActivity {
                     setPositionByGroup(mSpinnerGroup, group);
                 }
             }
-            mProgressDialogGetting.dismiss();
+            mProgressBar.setVisibility(View.GONE);
         });
     }
 
-    private void isUserInfoExist(ArrayList<String> stringList, String field) {
-        mTeachersProvider.getAllTeacherDocuments().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
-                    if (snapshot.exists()) {
-                        if (snapshot.contains(field)) {
-                            String allFields = snapshot.getString(field);
-                            stringList.add(allFields);
-                        }
-                    }
-                }
-            } else {
-                Snackbar.make(coordinatorLayout, "Error al obtener la información de los docentes", Snackbar.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    public void getAllKindergartens() {
+    private void getAllKindergartens() {
         List<Kinder> kinderList = new ArrayList<>();
         mKinderProvider.getAllDocuments().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

@@ -1,10 +1,6 @@
 package com.manuel.aulainventario.activities;
 
 import static com.manuel.aulainventario.utils.MyTools.calculateTotal;
-import static com.manuel.aulainventario.utils.MyTools.compareDataNumbers;
-import static com.manuel.aulainventario.utils.MyTools.compareDataString;
-import static com.manuel.aulainventario.utils.MyTools.deleteCurrentInformationNumbers;
-import static com.manuel.aulainventario.utils.MyTools.deleteCurrentInformationString;
 import static com.manuel.aulainventario.utils.MyTools.setPositionByCondition;
 import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
 
@@ -13,6 +9,8 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -36,6 +34,7 @@ import java.util.Objects;
 
 public class ActiveFormActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
+    ProgressBar mProgressBar;
     TextInputEditText mEditTextNumberA, mEditTextKeyA, mEditTextDescriptionA, mEditTextAmountA, mEditTextPriceA, mEditTextTotalA;
     MaterialTextView mTextViewConditionSelectedA;
     Spinner mSpinnerA;
@@ -43,7 +42,7 @@ public class ActiveFormActivity extends AppCompatActivity {
     AuthProvider mAuthProvider;
     CollectionsProvider mCollectionsProvider, mCollectionsProviderForNumbers;
     ActiveProvider mActiveProvider;
-    ProgressDialog mProgressDialog, mProgressDialogGetting;
+    ProgressDialog mProgressDialog;
     String mExtraIdActiveUpdate, mExtraActiveTitle;
     ArrayList<String> mConditionsList, mKeysList;
     ArrayList<Long> mNumbersList;
@@ -53,6 +52,7 @@ public class ActiveFormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_form);
         coordinatorLayout = findViewById(R.id.coordinatorActive);
+        mProgressBar = findViewById(R.id.progress_circular_active);
         mEditTextNumberA = findViewById(R.id.textInputNumberA);
         mEditTextKeyA = findViewById(R.id.textInputKeyA);
         mEditTextDescriptionA = findViewById(R.id.textInputDescriptionA);
@@ -82,11 +82,6 @@ public class ActiveFormActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Por favor, espere un momento");
         mProgressDialog.setCancelable(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialogGetting = new ProgressDialog(this);
-        mProgressDialogGetting.setTitle("Obteniendo datos...");
-        mProgressDialogGetting.setMessage("Por favor, espere un momento");
-        mProgressDialogGetting.setCancelable(false);
-        mProgressDialogGetting.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mCollectionsProvider.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mConditionsList, "condition", mSpinnerA, "Estado: ", mTextViewConditionSelectedA, "Error al obtener los estados");
         mCollectionsProviderForNumbers.getNumbersByTeacher(mAuthProvider.getUid(), coordinatorLayout, mNumbersList);
         mActiveProvider.getKeysByTeacher(mAuthProvider, coordinatorLayout, mKeysList);
@@ -137,8 +132,22 @@ public class ActiveFormActivity extends AppCompatActivity {
                                                 double total = Double.parseDouble(totalField);
                                                 if (total != 0) {
                                                     if (!TextUtils.isEmpty(condition)) {
-                                                        compareDataNumbers(mNumbersList, number, coordinatorLayout, "Ya existe un registro con ese número");
-                                                        compareDataString(mKeysList, key, coordinatorLayout, "Ya existe un registro con esa clave");
+                                                        if (mNumbersList != null && !mNumbersList.isEmpty()) {
+                                                            for (long l : mNumbersList) {
+                                                                if (l == number) {
+                                                                    Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
+                                                                    return;
+                                                                }
+                                                            }
+                                                        }
+                                                        if (mKeysList != null && !mKeysList.isEmpty()) {
+                                                            for (String s : mKeysList) {
+                                                                if (s.equals(key)) {
+                                                                    Snackbar.make(coordinatorLayout, "Ya existe un registro con esa clave", Snackbar.LENGTH_SHORT).show();
+                                                                    return;
+                                                                }
+                                                            }
+                                                        }
                                                         Active active = new Active();
                                                         active.setId(mExtraIdActiveUpdate);
                                                         active.setNumber(number);
@@ -206,8 +215,22 @@ public class ActiveFormActivity extends AppCompatActivity {
                                                 double total = Double.parseDouble(totalField);
                                                 if (total != 0) {
                                                     if (!TextUtils.isEmpty(condition)) {
-                                                        compareDataNumbers(mNumbersList, number, coordinatorLayout, "Ya existe un registro con ese número");
-                                                        compareDataString(mKeysList, key, coordinatorLayout, "Ya existe un registro con esa clave");
+                                                        if (mNumbersList != null && !mNumbersList.isEmpty()) {
+                                                            for (long l : mNumbersList) {
+                                                                if (l == number) {
+                                                                    Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
+                                                                    return;
+                                                                }
+                                                            }
+                                                        }
+                                                        if (mKeysList != null && !mKeysList.isEmpty()) {
+                                                            for (String s : mKeysList) {
+                                                                if (s.equals(key)) {
+                                                                    Snackbar.make(coordinatorLayout, "Ya existe un registro con esa clave", Snackbar.LENGTH_SHORT).show();
+                                                                    return;
+                                                                }
+                                                            }
+                                                        }
                                                         Active active = new Active();
                                                         active.setNumber(number);
                                                         active.setKey(key);
@@ -256,18 +279,16 @@ public class ActiveFormActivity extends AppCompatActivity {
     }
 
     private void getActive() {
-        mProgressDialogGetting.show();
+        mProgressBar.setVisibility(View.VISIBLE);
         mActiveProvider.getActiveById(mExtraIdActiveUpdate).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("number")) {
                     long number = documentSnapshot.getLong("number");
                     mEditTextNumberA.setText(String.valueOf(number));
-                    deleteCurrentInformationNumbers(mNumbersList, number);
                 }
                 if (documentSnapshot.contains("key")) {
                     String key = documentSnapshot.getString("key");
                     mEditTextKeyA.setText(key);
-                    deleteCurrentInformationString(mKeysList, key);
                 }
                 if (documentSnapshot.contains("description")) {
                     String description = documentSnapshot.getString("description");
@@ -290,7 +311,7 @@ public class ActiveFormActivity extends AppCompatActivity {
                     setPositionByCondition(mSpinnerA, condition);
                 }
             }
-            mProgressDialogGetting.dismiss();
+            mProgressBar.setVisibility(View.GONE);
         });
     }
 

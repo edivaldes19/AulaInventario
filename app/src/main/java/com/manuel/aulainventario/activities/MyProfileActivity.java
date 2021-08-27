@@ -1,10 +1,11 @@
 package com.manuel.aulainventario.activities;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,13 +23,14 @@ public class MyProfileActivity extends AppCompatActivity {
     AuthProvider mAuthProvider;
     TeachersProvider mTeachersProvider;
     KinderProvider mKinderProvider;
-    ProgressDialog mProgressDialogGetting;
+    ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_profile);
         setTitle("Mi información");
+        mProgressBar = findViewById(R.id.progress_circular_my_info);
         mButtonEditInfo = findViewById(R.id.btnEditInfo);
         mTextViewTeachername = findViewById(R.id.textViewTeachernameProfile);
         mTextViewPhone = findViewById(R.id.textViewPhoneProfile);
@@ -42,11 +44,6 @@ public class MyProfileActivity extends AppCompatActivity {
         mTeachersProvider = new TeachersProvider();
         mAuthProvider = new AuthProvider();
         mKinderProvider = new KinderProvider();
-        mProgressDialogGetting = new ProgressDialog(this);
-        mProgressDialogGetting.setTitle("Obteniendo datos...");
-        mProgressDialogGetting.setMessage("Por favor, espere un momento");
-        mProgressDialogGetting.setCancelable(false);
-        mProgressDialogGetting.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mButtonEditInfo.setOnClickListener(v -> {
             startActivity(new Intent(this, EditInfoActivity.class));
             finish();
@@ -56,8 +53,9 @@ public class MyProfileActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void getTeacher() {
-        mProgressDialogGetting.show();
-        mTeachersProvider.getTeacher(mAuthProvider.getUid()).addOnSuccessListener(documentSnapshot -> {
+        String idTeacher = mAuthProvider.getUid();
+        mProgressBar.setVisibility(View.VISIBLE);
+        mTeachersProvider.getTeacher(idTeacher).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("idKinder")) {
                     String idKinder = documentSnapshot.getString("idKinder");
@@ -110,7 +108,7 @@ public class MyProfileActivity extends AppCompatActivity {
                     mTextViewLastUpdate.setText(time);
                 }
             }
-            mProgressDialogGetting.dismiss();
+            mProgressBar.setVisibility(View.GONE);
         });
     }
 }

@@ -1,5 +1,6 @@
 package com.manuel.aulainventario.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -70,6 +71,7 @@ public class PedagogicalFragment extends Fragment implements MaterialSearchBar.O
         return mView;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void searchByDescription(String description) {
         Query query = mPedagogicalProvider.getPedagogicalByDescription(description);
         FirestoreRecyclerOptions<Pedagogical> options = new FirestoreRecyclerOptions.Builder<Pedagogical>().setQuery(query, Pedagogical.class).build();
@@ -79,6 +81,7 @@ public class PedagogicalFragment extends Fragment implements MaterialSearchBar.O
         mPedagogicalSearch.startListening();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void getPedagogicalByCurrentTeacher() {
         Query query = mPedagogicalProvider.getPedagogicalByTeacher(mAuthProvider.getUid());
         FirestoreRecyclerOptions<Pedagogical> options = new FirestoreRecyclerOptions.Builder<Pedagogical>().setQuery(query, Pedagogical.class).build();

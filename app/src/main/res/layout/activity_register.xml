@@ -184,17 +184,17 @@
                 android:layout_marginEnd="30dp" />
 
             <HorizontalScrollView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginStart="30dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="30dp">
+                android:layout_marginTop="20dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -205,7 +205,7 @@
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/textViewGradeSelectedR"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="30dp"
                             android:layout_marginTop="15dp"
@@ -226,7 +226,7 @@
 
                         <Spinner
                             android:id="@+id/spinnerGradeRegister"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="30dp"
                             android:layout_marginTop="10dp"
@@ -246,7 +246,7 @@
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/textViewGroupSelectedR"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="30dp"
                             android:layout_marginTop="15dp"
@@ -267,7 +267,7 @@
 
                         <Spinner
                             android:id="@+id/spinnerGroupRegister"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="30dp"
                             android:layout_marginTop="10dp"

@@ -1,8 +1,5 @@
 package com.manuel.aulainventario.activities;
 
-import static com.manuel.aulainventario.utils.MyTools.compareDataString;
-import static com.manuel.aulainventario.utils.MyTools.compareTeachersInformation;
-import static com.manuel.aulainventario.utils.MyTools.isTeacherInfoExist;
 import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
 
 import android.annotation.SuppressLint;
@@ -48,7 +45,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
     KinderProvider mKinderProvider;
     CollectionsProvider mCollectionsProviderShifts, mCollectionsProviderGrades, mCollectionsProviderGroups;
     ProgressDialog mDialog;
-    ArrayList<String> mTeachernameList, mPhoneList, mShiftsList, mGradesList, mGroupsList;
+    ArrayList<String> mShiftsList, mGradesList, mGroupsList;
     List<Teacher> mTeacherList;
     String mIdKinder;
 
@@ -74,8 +71,6 @@ public class CompleteProfileActivity extends AppCompatActivity {
         mCollectionsProviderShifts = new CollectionsProvider(this, "Shifts");
         mCollectionsProviderGrades = new CollectionsProvider(this, "Grades");
         mCollectionsProviderGroups = new CollectionsProvider(this, "Groups");
-        mTeachernameList = new ArrayList<>();
-        mPhoneList = new ArrayList<>();
         mShiftsList = new ArrayList<>();
         mGradesList = new ArrayList<>();
         mGroupsList = new ArrayList<>();
@@ -87,12 +82,10 @@ public class CompleteProfileActivity extends AppCompatActivity {
         mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         validateFieldsAsYouType(mTextInputTeachername, "El nombre y apellido es obligatorio");
         validateFieldsAsYouType(mTextInputPhone, "El número de teléfono es obligatorio");
-        isTeacherInfoExist(coordinatorLayout, mTeachersProvider, mTeachernameList, "teachername");
-        isTeacherInfoExist(coordinatorLayout, mTeachersProvider, mPhoneList, "phone");
+        getAllKindergartens();
         mCollectionsProviderShifts.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mShiftsList, "turn", mSpinnerTurn, "Turno: ", mTextViewTurnSelected, "Error al obtener los turnos");
         mCollectionsProviderGrades.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGradesList, "grade", mSpinnerGrade, "Grado: ", mTextViewGradeSelected, "Error al obtener los grados");
         mCollectionsProviderGroups.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mGroupsList, "group", mSpinnerGroup, "Grupo: ", mTextViewGroupSelected, "Error al obtener los grupos");
-        getAllKindergartens();
         materialButtonRegister.setOnClickListener(v -> confirmInfo());
     }
 
@@ -109,17 +102,6 @@ public class CompleteProfileActivity extends AppCompatActivity {
                     if (!TextUtils.isEmpty(turn)) {
                         if (!TextUtils.isEmpty(grade)) {
                             if (!TextUtils.isEmpty(group)) {
-                                compareDataString(mTeachernameList, teachername, coordinatorLayout, "Ya existe un docente con ese nombre");
-                                compareDataString(mPhoneList, phone, coordinatorLayout, "Ya existe un docente con ese teléfono");
-                                compareTeachersInformation(mTeachersProvider, coordinatorLayout, mTeacherList);
-                                if (mTeacherList != null && !mTeacherList.isEmpty()) {
-                                    for (int i = 0; i < mTeacherList.size(); i++) {
-                                        if ((mTeacherList.get(i).getGrade().equals(grade)) && (mTeacherList.get(i).getGroup().equals(group)) && (mTeacherList.get(i).getTurn().equals(turn))) {
-                                            Snackbar.make(coordinatorLayout, "Ya existe un docente ocupando ese grupo", Snackbar.LENGTH_SHORT).show();
-                                            return;
-                                        }
-                                    }
-                                }
                                 updateTeacher(teachername, phone, turn, grade, group);
                             } else {
                                 Snackbar.make(coordinatorLayout, "Debe seleccionar un grupo", Snackbar.LENGTH_SHORT).show();

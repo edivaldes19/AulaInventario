@@ -1,5 +1,6 @@
 package com.manuel.aulainventario.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -70,6 +71,7 @@ public class ActiveFragment extends Fragment implements MaterialSearchBar.OnSear
         return mView;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void searchByDescription(String description) {
         Query query = mActiveProvider.getActiveByDescription(description);
         FirestoreRecyclerOptions<Active> options = new FirestoreRecyclerOptions.Builder<Active>().setQuery(query, Active.class).build();
@@ -79,6 +81,7 @@ public class ActiveFragment extends Fragment implements MaterialSearchBar.OnSear
         mActiveSearch.startListening();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void getActiveByCurrentTeacher() {
         Query query = mActiveProvider.getActiveByTeacher(mAuthProvider.getUid());
         FirestoreRecyclerOptions<Active> options = new FirestoreRecyclerOptions.Builder<Active>().setQuery(query, Active.class).build();

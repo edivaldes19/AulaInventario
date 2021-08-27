@@ -1,5 +1,9 @@
 package com.manuel.aulainventario.activities;
 
+import static com.manuel.aulainventario.utils.MyTools.isEmailValid;
+import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
+import static com.manuel.aulainventario.utils.MyTools.validatePasswordFieldsAsYouType;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -38,10 +42,6 @@ import com.manuel.aulainventario.providers.TeachersProvider;
 
 import java.util.Date;
 import java.util.Objects;
-
-import static com.manuel.aulainventario.utils.MyTools.isEmailValid;
-import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
-import static com.manuel.aulainventario.utils.MyTools.validatePasswordFieldsAsYouType;
 
 public class MainActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;

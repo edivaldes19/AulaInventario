@@ -127,7 +127,8 @@ public class ContactMeActivity extends AppCompatActivity {
     }
 
     private void getTeacher() {
-        mTeachersProvider.getTeacher(mAuthProvider.getUid()).addOnSuccessListener(documentSnapshot -> {
+        String idTeacher = mAuthProvider.getUid();
+        mTeachersProvider.getTeacher(idTeacher).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("teachername")) {
                     String teachername = documentSnapshot.getString("teachername");

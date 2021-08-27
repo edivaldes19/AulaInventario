@@ -1,13 +1,7 @@
 package com.manuel.aulainventario.activities;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,7 +47,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @SuppressLint("SetTextI18n")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        checkInternetConnection();
         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         googleMap.setMinZoomPreference(13);
         googleMap.setMaxZoomPreference(21);
@@ -111,19 +104,5 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onBackPressed() {
         super.onBackPressed();
         finish();
-    }
-
-    private void checkInternetConnection() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) MapsActivity.this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if (networkInfo != null && !networkInfo.isConnected()) {
-            new AlertDialog.Builder(MapsActivity.this).setTitle("Error de red").setMessage("¿Desea ir a la configuración de conexión del dispositivo?").setPositiveButton("Aceptar", (dialog, which) -> {
-                startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
-                finish();
-            }).setNegativeButton("Cancelar", (dialog, which) -> {
-                startActivity(new Intent(MapsActivity.this, HomeActivity.class));
-                finish();
-            }).show();
-        }
     }
 }

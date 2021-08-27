@@ -9,7 +9,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.manuel.aulainventario.models.Active;
 
 import java.util.ArrayList;
@@ -60,8 +59,8 @@ public class ActiveProvider {
         return mCollection.document(id).get();
     }
 
-    public Task<QuerySnapshot> getKeysByTeacher(AuthProvider authProvider, CoordinatorLayout coordinatorLayout, ArrayList<String> strings) {
-        return mCollection.whereEqualTo("idTeacher", authProvider.getUid()).get().addOnCompleteListener(task -> {
+    public void getKeysByTeacher(AuthProvider authProvider, CoordinatorLayout coordinatorLayout, ArrayList<String> strings) {
+        mCollection.whereEqualTo("idTeacher", authProvider.getUid()).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
                     if (snapshot.exists()) {

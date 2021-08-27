@@ -5,7 +5,6 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.manuel.aulainventario.models.Didactic;
 
 import java.util.Date;
@@ -49,9 +48,5 @@ public class DidacticProvider {
 
     public Task<DocumentSnapshot> getDidacticById(String id) {
         return mCollection.document(id).get();
-    }
-
-    public Task<QuerySnapshot> getDidacticNumbers(String idTeacher) {
-        return mCollection.whereEqualTo("idTeacher", idTeacher).get();
     }
 }

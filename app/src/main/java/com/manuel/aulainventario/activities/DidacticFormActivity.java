@@ -1,7 +1,5 @@
 package com.manuel.aulainventario.activities;
 
-import static com.manuel.aulainventario.utils.MyTools.compareDataNumbers;
-import static com.manuel.aulainventario.utils.MyTools.deleteCurrentInformationNumbers;
 import static com.manuel.aulainventario.utils.MyTools.setPositionByCondition;
 import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
 
@@ -10,6 +8,8 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -33,6 +33,7 @@ import java.util.Objects;
 
 public class DidacticFormActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
+    ProgressBar mProgressBar;
     TextInputEditText mEditTextNumberD, mEditTextDescriptionD, mEditTextAmountD;
     MaterialTextView mTextViewConditionSelectedD;
     Spinner mSpinnerD;
@@ -40,7 +41,7 @@ public class DidacticFormActivity extends AppCompatActivity {
     AuthProvider mAuthProvider;
     CollectionsProvider mCollectionsProvider, mCollectionsProviderForNumbers;
     DidacticProvider mDidacticProvider;
-    ProgressDialog mProgressDialog, mProgressDialogGetting;
+    ProgressDialog mProgressDialog;
     String mExtraIdDidacticUpdate, mExtraDidacticTitle;
     ArrayList<String> mConditionsList;
     ArrayList<Long> mNumbersList;
@@ -50,6 +51,7 @@ public class DidacticFormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_didactic_form);
         coordinatorLayout = findViewById(R.id.coordinatorDidactic);
+        mProgressBar = findViewById(R.id.progress_circular_didactic);
         mEditTextNumberD = findViewById(R.id.textInputNumberD);
         mEditTextDescriptionD = findViewById(R.id.textInputDescriptionD);
         mEditTextAmountD = findViewById(R.id.textInputAmountD);
@@ -75,11 +77,6 @@ public class DidacticFormActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Por favor, espere un momento");
         mProgressDialog.setCancelable(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialogGetting = new ProgressDialog(this);
-        mProgressDialogGetting.setTitle("Obteniendo datos...");
-        mProgressDialogGetting.setMessage("Por favor, espere un momento");
-        mProgressDialogGetting.setCancelable(false);
-        mProgressDialogGetting.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mCollectionsProvider.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mConditionsList, "condition", mSpinnerD, "Estado: ", mTextViewConditionSelectedD, "Error al obtener los estados");
         mCollectionsProviderForNumbers.getNumbersByTeacher(mAuthProvider.getUid(), coordinatorLayout, mNumbersList);
         validateFieldsAsYouType(mEditTextNumberD, "El número es obligatorio");
@@ -114,7 +111,14 @@ public class DidacticFormActivity extends AppCompatActivity {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
                                 if (!TextUtils.isEmpty(condition)) {
-                                    compareDataNumbers(mNumbersList, number, coordinatorLayout, "Ya existe un registro con ese número");
+                                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
+                                        for (long l : mNumbersList) {
+                                            if (l == number) {
+                                                Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
+                                                return;
+                                            }
+                                        }
+                                    }
                                     Didactic didactic = new Didactic();
                                     didactic.setId(mExtraIdDidacticUpdate);
                                     didactic.setNumber(number);
@@ -154,7 +158,14 @@ public class DidacticFormActivity extends AppCompatActivity {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
                                 if (!TextUtils.isEmpty(condition)) {
-                                    compareDataNumbers(mNumbersList, number, coordinatorLayout, "Ya existe un registro con ese número");
+                                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
+                                        for (long l : mNumbersList) {
+                                            if (l == number) {
+                                                Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
+                                                return;
+                                            }
+                                        }
+                                    }
                                     Didactic didactic = new Didactic();
                                     didactic.setNumber(number);
                                     didactic.setDescription(description);
@@ -185,13 +196,12 @@ public class DidacticFormActivity extends AppCompatActivity {
     }
 
     private void getDidactic() {
-        mProgressDialogGetting.show();
+        mProgressBar.setVisibility(View.VISIBLE);
         mDidacticProvider.getDidacticById(mExtraIdDidacticUpdate).addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 if (documentSnapshot.contains("number")) {
                     long number = documentSnapshot.getLong("number");
                     mEditTextNumberD.setText(String.valueOf(number));
-                    deleteCurrentInformationNumbers(mNumbersList, number);
                 }
                 if (documentSnapshot.contains("description")) {
                     String description = documentSnapshot.getString("description");
@@ -206,7 +216,7 @@ public class DidacticFormActivity extends AppCompatActivity {
                     setPositionByCondition(mSpinnerD, condition);
                 }
             }
-            mProgressDialogGetting.dismiss();
+            mProgressBar.setVisibility(View.GONE);
         });
     }
 

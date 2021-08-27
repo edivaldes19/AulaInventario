@@ -1,5 +1,6 @@
 package com.manuel.aulainventario.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -70,6 +71,7 @@ public class ConsumptionFragment extends Fragment implements MaterialSearchBar.O
         return mView;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void searchByDescription(String description) {
         Query query = mConsumptionProvider.getConsumptionByDescription(description);
         FirestoreRecyclerOptions<Consumption> options = new FirestoreRecyclerOptions.Builder<Consumption>().setQuery(query, Consumption.class).build();
@@ -79,6 +81,7 @@ public class ConsumptionFragment extends Fragment implements MaterialSearchBar.O
         mConsumptionSearch.startListening();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void getConsumptionByCurrentTeacher() {
         Query query = mConsumptionProvider.getConsumptionByTeacher(mAuthProvider.getUid());
         FirestoreRecyclerOptions<Consumption> options = new FirestoreRecyclerOptions.Builder<Consumption>().setQuery(query, Consumption.class).build();

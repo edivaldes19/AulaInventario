@@ -1,9 +1,6 @@
 package com.manuel.aulainventario.activities;
 
-import static com.manuel.aulainventario.utils.MyTools.compareDataString;
-import static com.manuel.aulainventario.utils.MyTools.compareTeachersInformation;
 import static com.manuel.aulainventario.utils.MyTools.isEmailValid;
-import static com.manuel.aulainventario.utils.MyTools.isTeacherInfoExist;
 import static com.manuel.aulainventario.utils.MyTools.validateFieldsAsYouType;
 import static com.manuel.aulainventario.utils.MyTools.validatePasswordFieldsAsYouType;
 
@@ -52,7 +49,7 @@ public class RegisterActivity extends AppCompatActivity {
     KinderProvider mKinderProvider;
     CollectionsProvider mCollectionsProviderShifts, mCollectionsProviderGrades, mCollectionsProviderGroups;
     ProgressDialog mDialog;
-    ArrayList<String> mTeachernameList, mPhoneList, mShiftsList, mGradesList, mGroupsList;
+    ArrayList<String> mShiftsList, mGradesList, mGroupsList;
     List<Teacher> mTeacherList;
     String mIdKinder;
 
@@ -82,8 +79,6 @@ public class RegisterActivity extends AppCompatActivity {
         mCollectionsProviderShifts = new CollectionsProvider(this, "Shifts");
         mCollectionsProviderGrades = new CollectionsProvider(this, "Grades");
         mCollectionsProviderGroups = new CollectionsProvider(this, "Groups");
-        mTeachernameList = new ArrayList<>();
-        mPhoneList = new ArrayList<>();
         mShiftsList = new ArrayList<>();
         mGradesList = new ArrayList<>();
         mGroupsList = new ArrayList<>();
@@ -101,8 +96,6 @@ public class RegisterActivity extends AppCompatActivity {
         validateFieldsAsYouType(mTextInputPhone, "El número de teléfono es obligatorio");
         validatePasswordFieldsAsYouType(mTextInputPasswordR, "La contraseña es obligatoria");
         validatePasswordFieldsAsYouType(mTextInputConfirmPasswordR, "Debe confirmar su contraseña");
-        isTeacherInfoExist(coordinatorLayout, mTeachersProvider, mTeachernameList, "teachername");
-        isTeacherInfoExist(coordinatorLayout, mTeachersProvider, mPhoneList, "phone");
         getAllKindergartens();
         mImageViewBack.setOnClickListener(v -> finish());
         materialButtonRegister.setOnClickListener(v -> normalRegister());
@@ -127,17 +120,6 @@ public class RegisterActivity extends AppCompatActivity {
                                 if (!TextUtils.isEmpty(group)) {
                                     if (!TextUtils.isEmpty(password)) {
                                         if (!TextUtils.isEmpty(confirmPassword)) {
-                                            compareDataString(mTeachernameList, teachername, coordinatorLayout, "Ya existe un docente con ese nombre");
-                                            compareDataString(mPhoneList, phone, coordinatorLayout, "Ya existe un docente con ese teléfono");
-                                            compareTeachersInformation(mTeachersProvider, coordinatorLayout, mTeacherList);
-                                            if (mTeacherList != null && !mTeacherList.isEmpty()) {
-                                                for (int i = 0; i < mTeacherList.size(); i++) {
-                                                    if ((mTeacherList.get(i).getGrade().equals(grade)) && (mTeacherList.get(i).getGroup().equals(group)) && (mTeacherList.get(i).getTurn().equals(turn))) {
-                                                        Snackbar.make(coordinatorLayout, "Ya existe un docente ocupando ese grupo", Snackbar.LENGTH_SHORT).show();
-                                                        return;
-                                                    }
-                                                }
-                                            }
                                             if (isEmailValid(email)) {
                                                 if (password.equals(confirmPassword)) {
                                                     if (password.length() >= 6) {
@@ -180,7 +162,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    public void getAllKindergartens() {
+    private void getAllKindergartens() {
         List<Kinder> kinderList = new ArrayList<>();
         mKinderProvider.getAllDocuments().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

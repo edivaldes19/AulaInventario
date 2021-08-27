@@ -5,17 +5,9 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.widget.Spinner;
 
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.manuel.aulainventario.models.Teacher;
-import com.manuel.aulainventario.providers.TeachersProvider;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -94,23 +86,6 @@ public class MyTools {
         });
     }
 
-    public static void isTeacherInfoExist(CoordinatorLayout coordinatorLayout, TeachersProvider teachersProvider, ArrayList<String> stringList, String field) {
-        teachersProvider.getAllTeacherDocuments().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
-                    if (snapshot.exists()) {
-                        if (snapshot.contains(field)) {
-                            String allFields = snapshot.getString(field);
-                            stringList.add(allFields);
-                        }
-                    }
-                }
-            } else {
-                Snackbar.make(coordinatorLayout, "Error al obtener la información de los docentes", Snackbar.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     public static void setPositionByCondition(Spinner spinner, String condition) {
         if (!TextUtils.isEmpty(condition)) {
             switch (condition) {
@@ -183,68 +158,5 @@ public class MyTools {
             }
         }
         return position;
-    }
-
-    public static void compareTeachersInformation(TeachersProvider teachersProvider, CoordinatorLayout coordinatorLayout, List<Teacher> teacherList) {
-        teachersProvider.getAllTeacherDocuments().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
-                    if (snapshot.exists()) {
-                        if (snapshot.contains("grade") && snapshot.contains("group") && snapshot.contains("turn")) {
-                            String allGrades = snapshot.getString("grade");
-                            String allGroups = snapshot.getString("group");
-                            String allShifts = snapshot.getString("turn");
-                            teacherList.add(new Teacher(null, null, null, null, null, allShifts, allGrades, allGroups, 0));
-                        }
-                    }
-                }
-            } else {
-                Snackbar.make(coordinatorLayout, "Error al obtener la información de los docentes", Snackbar.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    public static void compareDataString(ArrayList<String> strings, String text, CoordinatorLayout coordinatorLayout, String error) {
-        if (strings != null && !strings.isEmpty()) {
-            for (String s : strings) {
-                if (s.equals(text)) {
-                    Snackbar.make(coordinatorLayout, error, Snackbar.LENGTH_SHORT).show();
-                    return;
-                }
-            }
-        }
-    }
-
-    public static void compareDataNumbers(ArrayList<Long> longs, long number, CoordinatorLayout coordinatorLayout, String error) {
-        if (longs != null && !longs.isEmpty()) {
-            for (Long l : longs) {
-                if (l == number) {
-                    Snackbar.make(coordinatorLayout, error, Snackbar.LENGTH_SHORT).show();
-                    return;
-                }
-            }
-        }
-    }
-
-    public static void deleteCurrentInformationString(ArrayList<String> strings, String text) {
-        if (strings != null && !strings.isEmpty()) {
-            for (int i = 0; i < strings.size(); i++) {
-                if (strings.get(i).equals(text)) {
-                    strings.remove(i);
-                    break;
-                }
-            }
-        }
-    }
-
-    public static void deleteCurrentInformationNumbers(ArrayList<Long> longs, long number) {
-        if (longs != null && !longs.isEmpty()) {
-            for (int i = 0; i < longs.size(); i++) {
-                if (longs.get(i) == number) {
-                    longs.remove(i);
-                    break;
-                }
-            }
-        }
     }
 }
