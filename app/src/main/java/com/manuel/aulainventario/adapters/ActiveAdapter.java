@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -63,7 +64,9 @@ public class ActiveAdapter extends FirestoreRecyclerAdapter<Active, ActiveAdapte
             context.startActivity(intent);
         });
         holder.imageViewDelete.setOnClickListener(v -> mActiveProvider.delete(activeId).addOnCompleteListener(task -> {
-            if (!task.isSuccessful()) {
+            if (task.isSuccessful()) {
+                Toast.makeText(holder.itemView.getContext(), "Registro " + active.getNumber() + " eliminado", Toast.LENGTH_SHORT).show();
+            } else {
                 Snackbar.make(holder.itemView, "Error al eliminar el registro", Snackbar.LENGTH_SHORT).show();
             }
         }));

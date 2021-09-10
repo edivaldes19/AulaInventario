@@ -1,7 +1,6 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="@dimen/browser_actions_context_menu_max_width"
-    android:height="@dimen/browser_actions_context_menu_max_width"
-    android:tint="?attr/colorControlNormal"
+    android:width="100dp"
+    android:height="100dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path

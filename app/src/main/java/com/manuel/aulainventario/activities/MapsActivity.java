@@ -2,8 +2,11 @@ package com.manuel.aulainventario.activities;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -27,6 +30,7 @@ import com.squareup.picasso.Picasso;
 import java.util.Objects;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+    GoogleMap mMap;
     final LatLng mUruapan = new LatLng(19.4147269, -102.0522647);
     KinderProvider kinderProvider;
     MaterialTextView mTextViewNameKinder, mTextViewGardenKey, mTextViewAddressKinder;
@@ -47,7 +51,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @SuppressLint("SetTextI18n")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        mMap = googleMap;
         googleMap.setMinZoomPreference(13);
         googleMap.setMaxZoomPreference(21);
         CameraPosition camera = new CameraPosition.Builder().target(mUruapan).zoom(13).bearing(0).tilt(0).build();
@@ -64,7 +68,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mTouchImageViewReference = bottomSheetDialog.findViewById(R.id.sheetImageViewReferenceImage);
             if (marker.getTag() != null) {
                 Kinder kinder = (Kinder) marker.getTag();
-                mTextViewNameKinder.setText("J/N " + kinder.getName());
+                mTextViewNameKinder.setText("Jardín de Niños " + kinder.getName());
                 mTextViewGardenKey.setText("Clave: " + kinder.getGardenKey());
                 mTextViewAddressKinder.setText("Dirección: " + kinder.getAddress());
                 Picasso.get().load(kinder.getReferenceImageUrl()).placeholder(R.drawable.ic_cloud_download).into(mTouchImageViewReference);
@@ -98,6 +102,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Toast.makeText(MapsActivity.this, "Error al obtener las localizaciones de los jardines", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.map_layers, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.itemMapView) {
+            mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        } else if (id == R.id.itemSatelliteView) {
+            mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

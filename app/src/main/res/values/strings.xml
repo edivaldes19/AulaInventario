@@ -58,8 +58,8 @@
     <string name="EditMe">Editar información</string>
     <string name="title_activity_maps">Map</string>
     <string name="seeGardenMap">Ver mapa de jardines</string>
-    <string name="satelliteView">Vista de satélite</string>
-    <string name="pushSearch">Oprime aquí para buscar…</string>
     <string name="createNewRegister">Crear un nuevo registro</string>
     <string name="cleanForm">Limpiar formulario/Vaciar casillas</string>
+    <string name="satelliteView">Vista de satélite</string>
+    <string name="mapView">Vista de mapa</string>
 </resources>

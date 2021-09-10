@@ -44,8 +44,7 @@ public class ActiveFormActivity extends AppCompatActivity {
     ActiveProvider mActiveProvider;
     ProgressDialog mProgressDialog;
     String mExtraIdActiveUpdate, mExtraActiveTitle;
-    ArrayList<String> mConditionsList, mKeysList;
-    ArrayList<Long> mNumbersList;
+    ArrayList<String> mConditionsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +67,6 @@ public class ActiveFormActivity extends AppCompatActivity {
         mCollectionsProviderForNumbers = new CollectionsProvider(this, "Active");
         mActiveProvider = new ActiveProvider();
         mConditionsList = new ArrayList<>();
-        mNumbersList = new ArrayList<>();
-        mKeysList = new ArrayList<>();
         mExtraIdActiveUpdate = getIntent().getStringExtra("idActiveUpdate");
         mExtraActiveTitle = getIntent().getStringExtra("activeTitle");
         if (!TextUtils.isEmpty(mExtraActiveTitle)) {
@@ -83,8 +80,6 @@ public class ActiveFormActivity extends AppCompatActivity {
         mProgressDialog.setCancelable(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mCollectionsProvider.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mConditionsList, "condition", mSpinnerA, "Estado: ", mTextViewConditionSelectedA, "Error al obtener los estados");
-        mCollectionsProviderForNumbers.getNumbersByTeacher(mAuthProvider.getUid(), coordinatorLayout, mNumbersList);
-        mActiveProvider.getKeysByTeacher(mAuthProvider, coordinatorLayout, mKeysList);
         validateFieldsAsYouType(mEditTextNumberA, "El número es obligatorio");
         validateFieldsAsYouType(mEditTextKeyA, "La clave es obligatoria");
         validateFieldsAsYouType(mEditTextDescriptionA, "La descripción es obligatoria");
@@ -132,22 +127,6 @@ public class ActiveFormActivity extends AppCompatActivity {
                                                 double total = Double.parseDouble(totalField);
                                                 if (total != 0) {
                                                     if (!TextUtils.isEmpty(condition)) {
-                                                        if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                                            for (long l : mNumbersList) {
-                                                                if (l == number) {
-                                                                    Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                                                    return;
-                                                                }
-                                                            }
-                                                        }
-                                                        if (mKeysList != null && !mKeysList.isEmpty()) {
-                                                            for (String s : mKeysList) {
-                                                                if (s.equals(key)) {
-                                                                    Snackbar.make(coordinatorLayout, "Ya existe un registro con esa clave", Snackbar.LENGTH_SHORT).show();
-                                                                    return;
-                                                                }
-                                                            }
-                                                        }
                                                         Active active = new Active();
                                                         active.setId(mExtraIdActiveUpdate);
                                                         active.setNumber(number);
@@ -215,22 +194,6 @@ public class ActiveFormActivity extends AppCompatActivity {
                                                 double total = Double.parseDouble(totalField);
                                                 if (total != 0) {
                                                     if (!TextUtils.isEmpty(condition)) {
-                                                        if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                                            for (long l : mNumbersList) {
-                                                                if (l == number) {
-                                                                    Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                                                    return;
-                                                                }
-                                                            }
-                                                        }
-                                                        if (mKeysList != null && !mKeysList.isEmpty()) {
-                                                            for (String s : mKeysList) {
-                                                                if (s.equals(key)) {
-                                                                    Snackbar.make(coordinatorLayout, "Ya existe un registro con esa clave", Snackbar.LENGTH_SHORT).show();
-                                                                    return;
-                                                                }
-                                                            }
-                                                        }
                                                         Active active = new Active();
                                                         active.setNumber(number);
                                                         active.setKey(key);
@@ -334,7 +297,7 @@ public class ActiveFormActivity extends AppCompatActivity {
             mProgressDialog.dismiss();
             if (task.isSuccessful()) {
                 finish();
-                Toast.makeText(this, "Registro editado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Registro " + active.getNumber() + " editado", Toast.LENGTH_SHORT).show();
             } else {
                 Snackbar.make(coordinatorLayout, "Error al editar el registro", Snackbar.LENGTH_SHORT).show();
             }

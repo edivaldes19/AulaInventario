@@ -44,7 +44,6 @@ public class PedagogicalFormActivity extends AppCompatActivity {
     ProgressDialog mProgressDialog;
     String mExtraIdPedagogicalUpdate, mExtraPedagogicalTitle;
     ArrayList<String> mConditionsList;
-    ArrayList<Long> mNumbersList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +63,6 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         mCollectionsProviderForNumbers = new CollectionsProvider(this, "Pedagogical");
         mPedagogicalProvider = new PedagogicalProvider();
         mConditionsList = new ArrayList<>();
-        mNumbersList = new ArrayList<>();
         mExtraIdPedagogicalUpdate = getIntent().getStringExtra("idPedagogicalUpdate");
         mExtraPedagogicalTitle = getIntent().getStringExtra("pedagogicalTitle");
         if (!TextUtils.isEmpty(mExtraPedagogicalTitle)) {
@@ -78,7 +76,6 @@ public class PedagogicalFormActivity extends AppCompatActivity {
         mProgressDialog.setCancelable(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mCollectionsProvider.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mConditionsList, "condition", mSpinnerP, "Estado: ", mTextViewConditionSelectedP, "Error al obtener los estados");
-        mCollectionsProviderForNumbers.getNumbersByTeacher(mAuthProvider.getUid(), coordinatorLayout, mNumbersList);
         validateFieldsAsYouType(mEditTextNumberP, "El número es obligatorio");
         validateFieldsAsYouType(mEditTextDescriptionP, "La descripción es obligatoria");
         validateFieldsAsYouType(mEditTextAmountP, "La cantidad es obligatoria");
@@ -111,14 +108,6 @@ public class PedagogicalFormActivity extends AppCompatActivity {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
                                 if (!TextUtils.isEmpty(condition)) {
-                                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                        for (long l : mNumbersList) {
-                                            if (l == number) {
-                                                Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                                return;
-                                            }
-                                        }
-                                    }
                                     Pedagogical pedagogical = new Pedagogical();
                                     pedagogical.setId(mExtraIdPedagogicalUpdate);
                                     pedagogical.setNumber(number);
@@ -158,14 +147,6 @@ public class PedagogicalFormActivity extends AppCompatActivity {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
                                 if (!TextUtils.isEmpty(condition)) {
-                                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                        for (long l : mNumbersList) {
-                                            if (l == number) {
-                                                Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                                return;
-                                            }
-                                        }
-                                    }
                                     Pedagogical pedagogical = new Pedagogical();
                                     pedagogical.setNumber(number);
                                     pedagogical.setDescription(description);
@@ -239,7 +220,7 @@ public class PedagogicalFormActivity extends AppCompatActivity {
             mProgressDialog.dismiss();
             if (task.isSuccessful()) {
                 finish();
-                Toast.makeText(this, "Registro editado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Registro " + pedagogical.getNumber() + " editado", Toast.LENGTH_SHORT).show();
             } else {
                 Snackbar.make(coordinatorLayout, "Error al editar el registro", Snackbar.LENGTH_SHORT).show();
             }

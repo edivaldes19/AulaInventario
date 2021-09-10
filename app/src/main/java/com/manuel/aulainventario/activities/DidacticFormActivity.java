@@ -44,7 +44,6 @@ public class DidacticFormActivity extends AppCompatActivity {
     ProgressDialog mProgressDialog;
     String mExtraIdDidacticUpdate, mExtraDidacticTitle;
     ArrayList<String> mConditionsList;
-    ArrayList<Long> mNumbersList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +63,6 @@ public class DidacticFormActivity extends AppCompatActivity {
         mCollectionsProviderForNumbers = new CollectionsProvider(this, "Didactic");
         mDidacticProvider = new DidacticProvider();
         mConditionsList = new ArrayList<>();
-        mNumbersList = new ArrayList<>();
         mExtraIdDidacticUpdate = getIntent().getStringExtra("idDidacticUpdate");
         mExtraDidacticTitle = getIntent().getStringExtra("didacticTitle");
         if (!TextUtils.isEmpty(mExtraDidacticTitle)) {
@@ -78,7 +76,6 @@ public class DidacticFormActivity extends AppCompatActivity {
         mProgressDialog.setCancelable(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mCollectionsProvider.getAllTheDocumentsInACollectionAndSetTheAdapter(coordinatorLayout, mConditionsList, "condition", mSpinnerD, "Estado: ", mTextViewConditionSelectedD, "Error al obtener los estados");
-        mCollectionsProviderForNumbers.getNumbersByTeacher(mAuthProvider.getUid(), coordinatorLayout, mNumbersList);
         validateFieldsAsYouType(mEditTextNumberD, "El número es obligatorio");
         validateFieldsAsYouType(mEditTextDescriptionD, "La descripción es obligatoria");
         validateFieldsAsYouType(mEditTextAmountD, "La cantidad es obligatoria");
@@ -111,14 +108,6 @@ public class DidacticFormActivity extends AppCompatActivity {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
                                 if (!TextUtils.isEmpty(condition)) {
-                                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                        for (long l : mNumbersList) {
-                                            if (l == number) {
-                                                Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                                return;
-                                            }
-                                        }
-                                    }
                                     Didactic didactic = new Didactic();
                                     didactic.setId(mExtraIdDidacticUpdate);
                                     didactic.setNumber(number);
@@ -158,14 +147,6 @@ public class DidacticFormActivity extends AppCompatActivity {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
                                 if (!TextUtils.isEmpty(condition)) {
-                                    if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                        for (long l : mNumbersList) {
-                                            if (l == number) {
-                                                Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                                return;
-                                            }
-                                        }
-                                    }
                                     Didactic didactic = new Didactic();
                                     didactic.setNumber(number);
                                     didactic.setDescription(description);
@@ -226,7 +207,7 @@ public class DidacticFormActivity extends AppCompatActivity {
             mProgressDialog.dismiss();
             if (task.isSuccessful()) {
                 finish();
-                Toast.makeText(this, "Registro creado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Registro " + didactic.getNumber() + " creado", Toast.LENGTH_SHORT).show();
             } else {
                 Snackbar.make(coordinatorLayout, "Error al crear el registro", Snackbar.LENGTH_SHORT).show();
             }

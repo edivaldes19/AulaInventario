@@ -24,7 +24,6 @@ import com.manuel.aulainventario.providers.AuthProvider;
 import com.manuel.aulainventario.providers.CollectionsProvider;
 import com.manuel.aulainventario.providers.ConsumptionProvider;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
@@ -38,7 +37,6 @@ public class ConsumptionFormActivity extends AppCompatActivity {
     CollectionsProvider mCollectionsProviderForNumbers;
     ProgressDialog mProgressDialog;
     String mExtraIdConsumptionUpdate, mExtraConsumptionTitle;
-    ArrayList<Long> mNumbersList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +52,6 @@ public class ConsumptionFormActivity extends AppCompatActivity {
         mAuthProvider = new AuthProvider();
         mConsumptionProvider = new ConsumptionProvider();
         mCollectionsProviderForNumbers = new CollectionsProvider(this, "Consumption");
-        mNumbersList = new ArrayList<>();
         mExtraIdConsumptionUpdate = getIntent().getStringExtra("idConsumptionUpdate");
         mExtraConsumptionTitle = getIntent().getStringExtra("consumptionTitle");
         if (!TextUtils.isEmpty(mExtraConsumptionTitle)) {
@@ -67,7 +64,6 @@ public class ConsumptionFormActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Por favor, espere un momento");
         mProgressDialog.setCancelable(false);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mCollectionsProviderForNumbers.getNumbersByTeacher(mAuthProvider.getUid(), coordinatorLayout, mNumbersList);
         validateFieldsAsYouType(mEditTextNumberC, "El número es obligatorio");
         validateFieldsAsYouType(mEditTextDescriptionC, "La descripción es obligatoria");
         validateFieldsAsYouType(mEditTextAmountC, "La cantidad es obligatoria");
@@ -98,14 +94,6 @@ public class ConsumptionFormActivity extends AppCompatActivity {
                         if (!TextUtils.isEmpty(amountField)) {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
-                                if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                    for (long l : mNumbersList) {
-                                        if (l == number) {
-                                            Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                            return;
-                                        }
-                                    }
-                                }
                                 Consumption consumption = new Consumption();
                                 consumption.setId(mExtraIdConsumptionUpdate);
                                 consumption.setNumber(number);
@@ -139,14 +127,6 @@ public class ConsumptionFormActivity extends AppCompatActivity {
                         if (!TextUtils.isEmpty(amountField)) {
                             long amount = Long.parseLong(amountField);
                             if (amount != 0) {
-                                if (mNumbersList != null && !mNumbersList.isEmpty()) {
-                                    for (long l : mNumbersList) {
-                                        if (l == number) {
-                                            Snackbar.make(coordinatorLayout, "Ya existe un registro con ese número", Snackbar.LENGTH_SHORT).show();
-                                            return;
-                                        }
-                                    }
-                                }
                                 Consumption consumption = new Consumption();
                                 consumption.setNumber(number);
                                 consumption.setDescription(description);
@@ -212,7 +192,7 @@ public class ConsumptionFormActivity extends AppCompatActivity {
             mProgressDialog.dismiss();
             if (task.isSuccessful()) {
                 finish();
-                Toast.makeText(this, "Registro editado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Registro " + consumption.getNumber() + " editado", Toast.LENGTH_SHORT).show();
             } else {
                 Snackbar.make(coordinatorLayout, "Error al editar el registro", Snackbar.LENGTH_SHORT).show();
             }

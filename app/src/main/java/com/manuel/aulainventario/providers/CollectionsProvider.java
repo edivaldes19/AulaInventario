@@ -60,21 +60,4 @@ public class CollectionsProvider {
             }
         });
     }
-
-    public void getNumbersByTeacher(String idTeacher, CoordinatorLayout coordinatorLayout, ArrayList<Long> longs) {
-        mCollection.whereEqualTo("idTeacher", idTeacher).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
-                    if (snapshot.exists()) {
-                        if (snapshot.contains("number")) {
-                            long allFields = snapshot.getLong("number");
-                            longs.add(allFields);
-                        }
-                    }
-                }
-            } else {
-                Snackbar.make(coordinatorLayout, "Error al obtener los números", Snackbar.LENGTH_SHORT).show();
-            }
-        });
-    }
 }

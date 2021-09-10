@@ -25,7 +25,7 @@
             app:mt_leftTextSelectorTint="@color/colorPrimary"
             app:mt_maxSuggestionsCount="10"
             app:mt_menuIconTint="@color/colorPrimary"
-            app:mt_placeholder="@string/pushSearch"
+            app:mt_placeholder="Buscar en técnico pedagógico"
             app:mt_placeholderColor="@color/colorPrimary"
             app:mt_searchIconTint="@color/colorPrimary"
             app:mt_textColor="@color/colorPrimary" />
@@ -51,6 +51,6 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_add"
         android:tooltipText="@string/createNewRegister"
-        tools:ignore="ContentDescription"
+        tools:ignore="ContentDescription,SpeakableTextPresentCheck"
         tools:targetApi="o" />
 </FrameLayout>

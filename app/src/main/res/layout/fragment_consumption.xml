@@ -25,7 +25,7 @@
             app:mt_leftTextSelectorTint="@color/colorPrimary"
             app:mt_maxSuggestionsCount="10"
             app:mt_menuIconTint="@color/colorPrimary"
-            app:mt_placeholder="@string/pushSearch"
+            app:mt_placeholder="Buscar en material de consumo"
             app:mt_placeholderColor="@color/colorPrimary"
             app:mt_searchIconTint="@color/colorPrimary"
             app:mt_textColor="@color/colorPrimary" />

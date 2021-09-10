@@ -1,21 +1,15 @@
 package com.manuel.aulainventario.providers;
 
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.manuel.aulainventario.models.Active;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class ActiveProvider {
     CollectionReference mCollection;
@@ -57,22 +51,5 @@ public class ActiveProvider {
 
     public Task<DocumentSnapshot> getActiveById(String id) {
         return mCollection.document(id).get();
-    }
-
-    public void getKeysByTeacher(AuthProvider authProvider, CoordinatorLayout coordinatorLayout, ArrayList<String> strings) {
-        mCollection.whereEqualTo("idTeacher", authProvider.getUid()).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot snapshot : Objects.requireNonNull(task.getResult())) {
-                    if (snapshot.exists()) {
-                        if (snapshot.contains("key")) {
-                            String allFields = snapshot.getString("key");
-                            strings.add(allFields);
-                        }
-                    }
-                }
-            } else {
-                Snackbar.make(coordinatorLayout, "Error al obtener las claves", Snackbar.LENGTH_SHORT).show();
-            }
-        });
     }
 }
